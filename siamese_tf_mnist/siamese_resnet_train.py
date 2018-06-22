@@ -93,7 +93,7 @@ def train_siamese():
             correct_count = 0
             for i in range(100, len(test_images)):
                 tm = test_images[i]
-                idn = siamese.single_sample_identity.eval({siamese.x1: inference.format_single_sample(tm),
+                idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
                                                            siamese.x2: gallery_image})
                 if gallery_label[idn] == test_labels[i]:
                     correct_count += 1
