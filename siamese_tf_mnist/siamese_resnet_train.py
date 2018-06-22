@@ -27,7 +27,7 @@ model_save_dir = '../model/mnist'
 model_name = 'model.ckpt-resnet'
 model_save_path = os.path.join(model_save_dir, model_name)
 # learning_rates = [0.01, 0.001, 0.0001]
-learning_rates = [0.01, 0.001]
+learning_rates = [0.1, 0.01]
 boundaries = [40000]
 
 
@@ -91,13 +91,13 @@ def train_siamese():
 
             print('Start test...')
             correct_count = 0
-            for i in range(100, len(test_images)):
+            for i in range(100, 2100):  # len(test_images)
                 tm = test_images[i]
                 idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
                                                            siamese.x2: gallery_image})
                 if gallery_label[idn] == test_labels[i]:
                     correct_count += 1
-            accuracy = correct_count / (len(test_images)-100)
+            accuracy = correct_count / (2100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
 train_siamese()
 
