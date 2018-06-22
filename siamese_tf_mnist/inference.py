@@ -60,6 +60,7 @@ class siamese:
             padding="same",
             activation=tf.nn.relu,
             name='conv1')
+        print(conv1.name)
 
         # Pooling Layer #1
         # First max pooling layer with a 2x2 filter and stride of 2
