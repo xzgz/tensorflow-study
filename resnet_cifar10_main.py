@@ -255,6 +255,8 @@ def run_cifar(flags_obj):
 
 def main(_):
     with logger.benchmark_context(flags.FLAGS):
+        print('data_format:', flags.FLAGS.data_format)
+        print('dtype:', flags_core.get_tf_dtype(flags.FLAGS))
         run_cifar(flags.FLAGS)
 
 
