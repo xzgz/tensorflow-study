@@ -86,7 +86,7 @@ def train_siamese():
             print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.4f}'.format(
                 gs_v, iterations, lr_v, loss_v))
 
-        if iterations % 1000 == 0:
+        if iterations % 100 == 0:
             saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
 
             print('Start test...')
