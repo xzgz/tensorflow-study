@@ -38,7 +38,7 @@ class Siamese:
             conv_stride=1,
             first_pool_size=None,
             first_pool_stride=None,
-            block_sizes=[5] * 3,
+            block_sizes=[1] * 2,
             block_strides=[1, 2, 2],
             final_size=64,
             resnet_version=2,
