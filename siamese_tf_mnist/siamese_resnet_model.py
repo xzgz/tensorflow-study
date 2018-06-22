@@ -16,7 +16,8 @@ class Siamese:
         self.x2 = tf.placeholder(tf.float32, [None, 784])
         self.is_training = is_training
 
-        with tf.variable_scope("siamese") as variable_scope:
+        variable_scope = tf.variable_scope("siamese")
+        with variable_scope:
             self.o1 = self.cnn_model(self.x1, self.is_training, variable_scope)
             variable_scope.reuse_variables()
             self.o2 = self.cnn_model(self.x2, self.is_training, variable_scope)
