@@ -16,11 +16,10 @@ class Siamese:
         self.x2 = tf.placeholder(tf.float32, [None, 784])
         self.is_training = is_training
 
-        variable_scope = tf.variable_scope("siamese")
-        with variable_scope as scope:
-            self.o1 = self.cnn_model(self.x1, self.is_training, variable_scope)
+        with self.model_variable_scope() as scope:
+            self.o1 = self.cnn_model(self.x1, self.is_training, self.model_variable_scope)
             scope.reuse_variables()
-            self.o2 = self.cnn_model(self.x2, self.is_training, variable_scope)
+            self.o2 = self.cnn_model(self.x2, self.is_training, self.model_variable_scope)
 
         # Create loss
         self.y_ = tf.placeholder(tf.float32, [None])
@@ -28,7 +27,10 @@ class Siamese:
         self.distance = self.pair_distance()
         self.single_sample_identity = tf.argmax(-self.distance, 0)
 
-    def cnn_model(self, input_images, is_training, variable_scope):
+    def model_variable_scope(self):
+        return tf.variable_scope("siamese")
+
+    def cnn_model(self, input_images, is_training, model_variable_scope):
         inputs = tf.reshape(input_images, [-1, 1, 28, 28])
         resnet50_mnist = resnet_model.Model(
             resnet_size=32,                         # resnet_size must be 6n+2, here n=5
@@ -46,7 +48,7 @@ class Siamese:
             data_format='channels_first',
             dtype=tf.float32
         )
-        features = resnet50_mnist(inputs, is_training, variable_scope)
+        features = resnet50_mnist(inputs, is_training, model_variable_scope)
 
         return features
 
