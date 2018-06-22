@@ -1,0 +1,13 @@
+crnn/tfboard/
+crnn/model/
+crnn/data/train_data/
+crnn/data/test_data/
+crnn/data/result/
+crnn/external_data/
+/data/
+model/
+.idea/
+*.ckpt
+*.meta
+*.pyc
+*.*~
