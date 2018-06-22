@@ -257,6 +257,10 @@ def main(_):
     with logger.benchmark_context(flags.FLAGS):
         print('data_format:', flags.FLAGS.data_format)
         print('dtype:', flags_core.get_tf_dtype(flags.FLAGS))
+        print('flags_obj.export_dir:', flags.FLAGS.export_dir)
+        print('batch_size:', flags.FLAGS.batch_size)
+        print('train_epochs:', flags.FLAGS.train_epochs)
+        print('resnet_size:', flags.FLAGS.resnet_size)
         run_cifar(flags.FLAGS)
 
 
