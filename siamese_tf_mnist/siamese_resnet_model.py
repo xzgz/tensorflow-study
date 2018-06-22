@@ -39,8 +39,8 @@ class Siamese:
             first_pool_size=None,
             first_pool_stride=None,
             block_sizes=[1] * 2,
-            block_strides=[1, 2, 2],
-            final_size=64,
+            block_strides=[1, 2],
+            final_size=32,
             resnet_version=2,
             data_format='channels_first',
             dtype=tf.float32
