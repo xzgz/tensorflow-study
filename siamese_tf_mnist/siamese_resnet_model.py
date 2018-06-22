@@ -17,9 +17,9 @@ class Siamese:
         self.is_training = is_training
 
         variable_scope = tf.variable_scope("siamese")
-        with variable_scope:
+        with variable_scope as scope:
             self.o1 = self.cnn_model(self.x1, self.is_training, variable_scope)
-            variable_scope.reuse_variables()
+            scope.reuse_variables()
             self.o2 = self.cnn_model(self.x2, self.is_training, variable_scope)
 
         # Create loss
