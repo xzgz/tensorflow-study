@@ -17,14 +17,14 @@ import numpy as np
 import os
 import sys
 sys.path.insert(0, '/home/gysj/tensorflow-study')
+sys.path.insert(0, '/home/gysj/tensorflow-code/models')
 os.chdir('/home/gysj/tensorflow-study/siamese_tf_mnist')
 
 # import helpers
-from siamese_tf_mnist import inference
-from siamese_tf_mnist import visualize
+from siamese_tf_mnist import siamese_resnet_model
 
 model_save_dir = '../model/mnist'
-model_name = 'model.ckpt-fc'
+model_name = 'model.ckpt-resnet'
 model_save_path = os.path.join(model_save_dir, model_name)
 # learning_rates = [0.01, 0.001, 0.0001]
 learning_rates = [0.01, 0.001]
@@ -35,7 +35,7 @@ def train_siamese():
     # prepare data and tf.session
     global_step = tf.Variable(0, name='global_step', trainable=False)
     lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
-    siamese = inference.siamese(tf.estimator.ModeKeys.TRAIN)
+    siamese = siamese_resnet_model.Siamese(is_training=True)
     train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
     saver = tf.train.Saver()
 
