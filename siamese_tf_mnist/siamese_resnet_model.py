@@ -17,7 +17,6 @@ class Siamese:
         self.is_training = is_training
 
         with self.model_variable_scope() as scope:
-            scope.reuse_variables()
             self.o1 = self.cnn_model(self.x1, self.is_training, self.model_variable_scope)
             scope.reuse_variables()
             self.o2 = self.cnn_model(self.x2, self.is_training, self.model_variable_scope)
