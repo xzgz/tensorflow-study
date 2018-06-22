@@ -10,14 +10,14 @@ class siamese:
         self.x2 = tf.placeholder(tf.float32, [None, 784])
         self.mode = mode
 
-        with tf.variable_scope("siamese") as scope:
-            self.o1 = self.network(self.x1)
-            scope.reuse_variables()
-            self.o2 = self.network(self.x2)
         # with tf.variable_scope("siamese") as scope:
-        #     self.o1 = self.cnn_model(self.x1, self.mode)
+        #     self.o1 = self.network(self.x1)
         #     scope.reuse_variables()
-        #     self.o2 = self.cnn_model(self.x2, self.mode)
+        #     self.o2 = self.network(self.x2)
+        with tf.variable_scope("siamese") as scope:
+            self.o1 = self.cnn_model(self.x1, self.mode)
+            scope.reuse_variables()
+            self.o2 = self.cnn_model(self.x2, self.mode)
 
         # Create loss
         self.y_ = tf.placeholder(tf.float32, [None])
