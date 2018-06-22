@@ -27,7 +27,7 @@ model_save_dir = '../model/mnist'
 model_name = 'model.ckpt-resnet'
 model_save_path = os.path.join(model_save_dir, model_name)
 # learning_rates = [0.01, 0.001, 0.0001]
-learning_rates = [0.01, 0.001]
+learning_rates = [0.001, 0.0001]
 boundaries = [40000]
 
 
