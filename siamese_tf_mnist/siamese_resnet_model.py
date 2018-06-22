@@ -17,9 +17,9 @@ class Siamese:
         self.is_training = is_training
 
         with tf.variable_scope("siamese") as scope:
-            self.o1 = self.cnn_model(self.x1, self.mode)
+            self.o1 = self.cnn_model(self.x1, self.is_training)
             scope.reuse_variables()
-            self.o2 = self.cnn_model(self.x2, self.mode)
+            self.o2 = self.cnn_model(self.x2, self.is_training)
 
         # Create loss
         self.y_ = tf.placeholder(tf.float32, [None])
