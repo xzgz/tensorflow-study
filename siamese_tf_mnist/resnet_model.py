@@ -545,8 +545,8 @@ class Model(object):
         inputs = tf.identity(inputs, 'final_reduce_mean')
 
         inputs = tf.reshape(inputs, [-1, self.final_size])
-        inputs = tf.layers.dense(inputs=inputs, units=1024)
-        inputs = tf.layers.dense(inputs=inputs, units=self.num_classes)
+        # inputs = tf.layers.dense(inputs=inputs, units=1024)
+        # inputs = tf.layers.dense(inputs=inputs, units=self.num_classes)
         inputs = tf.identity(inputs, 'final_dense')
         return inputs
 
