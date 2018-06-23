@@ -16,10 +16,9 @@ class Siamese:
         self.x2 = tf.placeholder(tf.float32, [None, 784])
         self.is_training = is_training
 
-        with self.model_variable_scope() as scope:
-            self.o1 = self.cnn_model(self.x1, self.is_training, self.model_variable_scope)
-            scope.reuse_variables()
-            self.o2 = self.cnn_model(self.x2, self.is_training, self.model_variable_scope)
+        # with self.model_variable_scope() as scope:
+        self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
+        self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.network(self.x1)
         #     scope.reuse_variables()
@@ -35,7 +34,7 @@ class Siamese:
     def model_variable_scope(self):
         return tf.variable_scope("siamese")
 
-    def cnn_model(self, input_images, is_training, model_variable_scope):
+    def cnn_model(self, input_images, is_training, scope_reuse):
         inputs = tf.reshape(input_images, [-1, 1, 28, 28])
         # resnet50_mnist = resnet_model.Model(
         #     resnet_size=32,                         # resnet_size must be 6n+2, here n=5
@@ -69,9 +68,9 @@ class Siamese:
             data_format='channels_first',
             dtype=tf.float32
         )
-        features = resnet50_mnist(inputs, is_training, model_variable_scope)
-        # params=tf.trainable_variables()
-        # print(params)
+        features = resnet50_mnist(inputs, is_training, scope_reuse)
+        params=tf.trainable_variables()
+        print(params)
 
         return features
 
