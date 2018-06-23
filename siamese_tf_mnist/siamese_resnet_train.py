@@ -24,7 +24,7 @@ os.chdir(root)
 from siamese_tf_mnist import siamese_resnet_model
 
 model_save_dir = 'model/mnist'
-model_name = 'model.ckpt-resnet'
+model_name = 'model.ckpt-resnet-ce'
 model_save_path = os.path.join(model_save_dir, model_name)
 # learning_rates = [0.01, 0.001, 0.0001]
 learning_rates = [0.1, 0.01]
