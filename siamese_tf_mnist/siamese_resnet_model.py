@@ -105,7 +105,8 @@ class Siamese:
     def loss_cross_entropy(self):
         inner_product = tf.multiply(self.o1, self.o2)
         inner_product = tf.reduce_sum(inner_product, axis=1)
-        loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
+        losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
+        loss = tf.reduce_mean(losses)
         return loss
 
     def pair_distance(self):
