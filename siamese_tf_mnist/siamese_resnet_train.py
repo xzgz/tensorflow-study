@@ -29,9 +29,11 @@ model_name = 'model.ckpt-resnet'
 snapshot = 'model.ckpt-resnet-92000'
 model_save_path = os.path.join(model_save_dir, model_name)
 model_snapshot_path = os.path.join(model_save_dir, snapshot)
+# model_snapshot_path = None
 # learning_rates = [0.01, 0.001, 0.0001]
 learning_rates = [0.1, 0.01]
 start_iterations = 92000
+# start_iterations = 0
 max_iterations = 240000
 boundaries = [220000]
 
@@ -115,13 +117,13 @@ def train_siamese():
 
             print('Start test...')
             correct_count = 0
-            for i in range(100, test_images_num):  # len(test_images)
+            for i in range(100, 2100):
                 tm = test_images[i]
                 idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
                                                            siamese.x2: gallery_image})
                 if gallery_label[idn] == test_labels[i]:
                     correct_count += 1
-            accuracy = correct_count / (test_images_num-100)
+            accuracy = correct_count / (2100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
 train_siamese()
 
