@@ -20,8 +20,8 @@ root = '/home/gysj/tensorflow-study'
 sys.path.insert(0, root)
 os.chdir(root)
 
-# import helpers
 from siamese_tf_mnist import siamese_resnet_model
+
 
 model_save_dir = 'model/mnist'
 # model_name = 'model.ckpt-resnet-ce'
