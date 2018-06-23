@@ -23,7 +23,8 @@ class Siamese:
 
         # Create loss
         self.y_ = tf.placeholder(tf.float32, [None])
-        self.loss = self.loss_with_spring()
+        # self.loss = self.loss_with_spring()
+        self.loss = self.loss_cross_entropy()
         self.distance = self.pair_distance()
         self.single_sample_identity = tf.argmax(-self.distance, 0)
 
@@ -99,6 +100,12 @@ class Siamese:
         neg = tf.multiply(labels_f, tf.maximum(0.0, tf.subtract(C, eucd)), name="Ny_C-eucd")
         losses = tf.add(pos, neg, name="losses")
         loss = tf.reduce_mean(losses, name="loss")
+        return loss
+
+    def loss_cross_entropy(self):
+        inner_product = tf.multiply(self.o1, self.o2)
+        inner_product = tf.reduce_sum(inner_product, axis=1)
+        loss = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
         return loss
 
     def pair_distance(self):
