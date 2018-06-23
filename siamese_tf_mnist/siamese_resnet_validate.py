@@ -19,12 +19,10 @@ import sys
 sys.path.insert(0, '/home/gysj/tensorflow-study')
 os.chdir('/home/gysj/tensorflow-study')
 
-# import helpers
-from siamese_tf_mnist import inference
-from siamese_tf_mnist import visualize
+from siamese_tf_mnist import siamese_resnet_model
 
 model_save_dir = 'model/mnist'
-snapshot = 'model.ckpt-10000'
+snapshot = 'model.ckpt-resnet-98000'
 model_snapshot_path = os.path.join(model_save_dir, snapshot)
 
 
@@ -33,12 +31,14 @@ def validate_accuracy():
     sess = tf.InteractiveSession()
 
     # setup siamese network
-    siamese = inference.siamese(tf.estimator.ModeKeys.EVAL)
+    siamese = siamese_resnet_model.Siamese(is_training=False)
     saver = tf.train.Saver()
     print('Restore parameters from model {}'.format(model_snapshot_path))
     saver.restore(sess, save_path=model_snapshot_path)
     test_images = mnist.test.images
     test_labels = mnist.test.labels
+    test_images_num = len(test_images)
+    print('There are {} test images.'.format(test_images_num))
     print('test_images:', test_images.shape, test_images.dtype)
     print('test_labels:', test_labels.shape, test_labels.dtype)
     gallery_image = []
@@ -52,15 +52,15 @@ def validate_accuracy():
             break
 
     correct_count = 0
-    for i in range(100, len(test_images)):
+    for i in range(100, test_images_num):
         tm = test_images[i]
-        idn = siamese.single_sample_identity.eval({siamese.x1: inference.format_single_sample(tm),
+        idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
                                                    siamese.x2: gallery_image})
         if gallery_label[idn] == test_labels[i]:
             correct_count += 1
         if (i+1) % 1000 == 0:
             print('Test {:d} images'.format(i+1))
-    accuracy = correct_count / (len(test_images)-100)
+    accuracy = correct_count / (test_images_num-100)
     print('accuracy:', accuracy)
 validate_accuracy()
 
@@ -70,12 +70,14 @@ def predict_single_sample():
     sess = tf.InteractiveSession()
 
     # setup siamese network
-    siamese = inference.siamese(tf.estimator.ModeKeys.PREDICT)
+    siamese = siamese_resnet_model.Siamese(is_training=False)
     saver = tf.train.Saver()
     print('Restore parameters from model {}'.format(model_snapshot_path))
     saver.restore(sess, save_path=model_snapshot_path)
     test_images = mnist.test.images
     test_labels = mnist.test.labels
+    test_images_num = len(test_images)
+    print('There are {} test images.'.format(test_images_num))
     print('test_images:', test_images.shape, test_images.dtype)
     print('test_labels:', test_labels.shape, test_labels.dtype)
     gallery_image = []
@@ -97,17 +99,17 @@ def predict_single_sample():
     # plt.show()
 
     tm = test_images[121]
-    distance = siamese.distance.eval({siamese.x1: inference.format_single_sample(tm),
+    distance = siamese.distance.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
                                       siamese.x2: gallery_image})
-    idn = siamese.single_sample_identity.eval({siamese.x1: inference.format_single_sample(tm),
+    idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
                                                siamese.x2: gallery_image})
     print(idn, type(idn))
     print('predict label:', gallery_label[idn])
     print('true label:', test_labels[121])
     print('distance:', distance)
-    print(tm.reshape([28, 28])[14, :])
-    plt.imshow((tm.reshape([28, 28])*255).astype('uint8'), cmap='gray')
-    plt.show()
+    # print(tm.reshape([28, 28])[14, :])
+    # plt.imshow((tm.reshape([28, 28])*255).astype('uint8'), cmap='gray')
+    # plt.show()
 # predict_single_sample()
 
 
