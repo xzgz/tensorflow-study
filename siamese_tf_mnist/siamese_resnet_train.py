@@ -65,9 +65,21 @@ def train_siamese():
         siamese.x1: batch_x1,
         siamese.x2: batch_x2,
         siamese.y_: batch_y})
+
+    correct_count = 0
+    for i in range(100, test_images_num):  # len(test_images)
+        tm = test_images[i]
+        idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
+                                                   siamese.x2: gallery_image})
+        if gallery_label[idn] == test_labels[i]:
+            correct_count += 1
+    accuracy = correct_count / (test_images_num-100)
+
     print('The initial loss:', initial_loss)
     print('Global step:', sess.run(global_step))
     print('Initial learning rate:', sess.run(lr))
+    print('Initial accuracy: {:.4f}'.format(accuracy))
+
 
     print('Start train...')
     for step in range(max_iterations):
