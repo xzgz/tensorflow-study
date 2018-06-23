@@ -32,22 +32,6 @@ class Siamese:
 
     def cnn_model(self, input_images, is_training, model_variable_scope):
         inputs = tf.reshape(input_images, [-1, 1, 28, 28])
-        resnet50_mnist = resnet_model.Model(
-            resnet_size=32,                         # resnet_size must be 6n+2, here n=5
-            bottleneck=False,
-            num_classes=64,
-            num_filters=32,
-            kernel_size=3,
-            conv_stride=1,
-            first_pool_size=2,
-            first_pool_stride=2,
-            block_sizes=[1],
-            block_strides=[2],
-            final_size=32,
-            resnet_version=2,
-            data_format='channels_first',
-            dtype=tf.float32
-        )
         # resnet50_mnist = resnet_model.Model(
         #     resnet_size=32,                         # resnet_size must be 6n+2, here n=5
         #     bottleneck=False,
@@ -64,6 +48,22 @@ class Siamese:
         #     data_format='channels_first',
         #     dtype=tf.float32
         # )
+        resnet50_mnist = resnet_model.Model(
+            resnet_size=32,                         # resnet_size must be 6n+2, here n=5
+            bottleneck=False,
+            num_classes=64,
+            num_filters=32,
+            kernel_size=3,
+            conv_stride=1,
+            first_pool_size=None,
+            first_pool_stride=None,
+            block_sizes=[5] * 3,
+            block_strides=[2],
+            final_size=32,
+            resnet_version=2,
+            data_format='channels_first',
+            dtype=tf.float32
+        )
         features = resnet50_mnist(inputs, is_training, model_variable_scope)
         # params=tf.trainable_variables()
         # print(params)
