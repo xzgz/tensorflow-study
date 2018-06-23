@@ -28,8 +28,8 @@ model_name = 'model.ckpt-resnet'
 model_save_path = os.path.join(model_save_dir, model_name)
 # learning_rates = [0.01, 0.001, 0.0001]
 learning_rates = [0.1, 0.01]
-max_iterations = 80000
-boundaries = [40000]
+max_iterations = 100000
+boundaries = [80000]
 
 
 def train_siamese():
@@ -43,6 +43,8 @@ def train_siamese():
     mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
     test_images = mnist.test.images
     test_labels = mnist.test.labels
+    test_images_num = len(test_images)
+    print('There are {} test images.'.format(test_images_num))
     gallery_image = []
     gallery_label = []
     for i in range(100):
@@ -82,23 +84,23 @@ def train_siamese():
         if np.isnan(loss_v):
             print('Model diverged with loss = NaN')
             quit()
-        if iterations % 100 == 0:
+        if iterations % 500 == 0:
             # print('step %d: loss %.3f' % (iterations, loss_v))
             print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.4f}'.format(
                 gs_v, iterations, lr_v, loss_v))
 
-        if iterations % 100 == 0:
-            # saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
+        if iterations % 2000 == 0:
+            saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
 
             print('Start test...')
             correct_count = 0
-            for i in range(100, 2100):  # len(test_images)
+            for i in range(100, test_images_num):  # len(test_images)
                 tm = test_images[i]
                 idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
                                                            siamese.x2: gallery_image})
                 if gallery_label[idn] == test_labels[i]:
                     correct_count += 1
-            accuracy = correct_count / (2100-100)
+            accuracy = correct_count / (test_images_num-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
 train_siamese()
 
