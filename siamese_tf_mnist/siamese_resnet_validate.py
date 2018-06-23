@@ -19,7 +19,7 @@ import sys
 sys.path.insert(0, '/home/gysj/tensorflow-study')
 os.chdir('/home/gysj/tensorflow-study')
 
-from siamese_tf_mnist import siamese_resnet_model
+from siamese_tf_mnist import siamese_resnet_model_v2
 
 model_save_dir = 'model/mnist'
 snapshot = 'model.ckpt-resnet-98000'
@@ -31,7 +31,7 @@ def validate_accuracy():
     sess = tf.InteractiveSession()
 
     # setup siamese network
-    siamese = siamese_resnet_model.Siamese(is_training=False)
+    siamese = siamese_resnet_model_v2.Siamese(is_training=False)
     saver = tf.train.Saver()
     print('Restore parameters from model {}'.format(model_snapshot_path))
     saver.restore(sess, save_path=model_snapshot_path)
@@ -54,7 +54,7 @@ def validate_accuracy():
     correct_count = 0
     for i in range(100, test_images_num):
         tm = test_images[i]
-        idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
+        idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model_v2.format_single_sample(tm),
                                                    siamese.x2: gallery_image})
         if gallery_label[idn] == test_labels[i]:
             correct_count += 1
@@ -70,7 +70,7 @@ def predict_single_sample():
     sess = tf.InteractiveSession()
 
     # setup siamese network
-    siamese = siamese_resnet_model.Siamese(is_training=False)
+    siamese = siamese_resnet_model_v2.Siamese(is_training=False)
     saver = tf.train.Saver()
     print('Restore parameters from model {}'.format(model_snapshot_path))
     saver.restore(sess, save_path=model_snapshot_path)
@@ -99,9 +99,9 @@ def predict_single_sample():
     # plt.show()
 
     tm = test_images[121]
-    distance = siamese.distance.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
+    distance = siamese.distance.eval({siamese.x1: siamese_resnet_model_v2.format_single_sample(tm),
                                       siamese.x2: gallery_image})
-    idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
+    idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model_v2.format_single_sample(tm),
                                                siamese.x2: gallery_image})
     print(idn, type(idn))
     print('predict label:', gallery_label[idn])

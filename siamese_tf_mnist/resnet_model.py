@@ -480,7 +480,7 @@ class Model(object):
     return tf.variable_scope('resnet_model',
                              custom_getter=self._custom_dtype_getter)
 
-  def __call__(self, inputs, training, model_variable_scope):
+  def __call__(self, inputs, training, scope_reuse):
     """Add operations to classify a batch of input images.
 
     Args:
@@ -492,8 +492,10 @@ class Model(object):
       A logits Tensor with shape [<batch_size>, self.num_classes].
     """
 
-    with self._model_variable_scope():
     # with model_variable_scope():
+    with self._model_variable_scope() as scope:
+        if scope_reuse:
+            scope.reuse_variables()
         if self.data_format == 'channels_first':
             # Convert the inputs from channels_last (NHWC) to channels_first (NCHW).
             # This provides a large performance boost on GPU. See
