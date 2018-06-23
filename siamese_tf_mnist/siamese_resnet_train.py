@@ -24,12 +24,16 @@ os.chdir(root)
 from siamese_tf_mnist import siamese_resnet_model
 
 model_save_dir = 'model/mnist'
-model_name = 'model.ckpt-resnet-ce'
+# model_name = 'model.ckpt-resnet-ce'
+model_name = 'model.ckpt-resnet'
+snapshot = 'model.ckpt-resnet-92000'
 model_save_path = os.path.join(model_save_dir, model_name)
+model_snapshot_path = os.path.join(model_save_dir, snapshot)
 # learning_rates = [0.01, 0.001, 0.0001]
-learning_rates = [0.01, 0.01]
-max_iterations = 100000
-boundaries = [80000]
+learning_rates = [0.1, 0.01]
+start_iterations = 92000
+max_iterations = 240000
+boundaries = [220000]
 
 
 def train_siamese():
@@ -57,6 +61,9 @@ def train_siamese():
 
     sess = tf.InteractiveSession()
     tf.global_variables_initializer().run()
+    if model_snapshot_path is not None:
+        print('Restore parameters from model {}'.format(model_snapshot_path))
+        saver.restore(sess, save_path=model_snapshot_path)
 
     batch_x1, batch_y1 = mnist.train.next_batch(128)
     batch_x2, batch_y2 = mnist.train.next_batch(128)
@@ -82,7 +89,7 @@ def train_siamese():
 
 
     print('Start train...')
-    for step in range(max_iterations):
+    for step in range(start_iterations, max_iterations):
         iterations = step+1
         batch_x1, batch_y1 = mnist.train.next_batch(128)
         batch_x2, batch_y2 = mnist.train.next_batch(128)
@@ -97,7 +104,7 @@ def train_siamese():
             print('Model diverged with loss = NaN')
             quit()
         if iterations % 500 == 0:
-            print('batch_y:\n', batch_y)
+            # print('batch_y:\n', batch_y)
             # print('step %d: loss %.3f' % (iterations, loss_v))
             print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.4f}'.format(
                 gs_v, iterations, lr_v, loss_v))

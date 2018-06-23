@@ -16,19 +16,19 @@ class Siamese:
         self.x2 = tf.placeholder(tf.float32, [None, 784])
         self.is_training = is_training
 
-        # with self.model_variable_scope() as scope:
-        #     self.o1 = self.cnn_model(self.x1, self.is_training, self.model_variable_scope)
-        #     scope.reuse_variables()
-        #     self.o2 = self.cnn_model(self.x2, self.is_training, self.model_variable_scope)
         with self.model_variable_scope() as scope:
-            self.o1 = self.network(self.x1)
+            self.o1 = self.cnn_model(self.x1, self.is_training, self.model_variable_scope)
             scope.reuse_variables()
-            self.o2 = self.network(self.x2)
+            self.o2 = self.cnn_model(self.x2, self.is_training, self.model_variable_scope)
+        # with self.model_variable_scope() as scope:
+        #     self.o1 = self.network(self.x1)
+        #     scope.reuse_variables()
+        #     self.o2 = self.network(self.x2)
 
         # Create loss
         self.y_ = tf.placeholder(tf.float32, [None])
-        # self.loss = self.loss_with_spring()
-        self.loss = self.loss_cross_entropy()
+        self.loss = self.loss_with_spring()
+        # self.loss = self.loss_cross_entropy()
         self.distance = self.pair_distance()
         self.single_sample_identity = tf.argmax(-self.distance, 0)
 
@@ -128,6 +128,7 @@ class Siamese:
         inner_product = tf.reduce_sum(inner_product, axis=1)
         losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
         loss = tf.reduce_mean(losses)
+        # tf.nn.softmax_cross_entropy_with_logits()
         return loss
 
     def pair_distance(self):
