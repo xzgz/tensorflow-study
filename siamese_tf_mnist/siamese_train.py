@@ -16,15 +16,15 @@ import tensorflow as tf
 import numpy as np
 import os
 import sys
-sys.path.insert(0, '/home/gysj/tensorflow-study')
-os.chdir('/home/gysj/tensorflow-study/siamese_tf_mnist')
+root = '/home/gysj/tensorflow-study'
+sys.path.insert(0, root)
+os.chdir(root)
 
 # import helpers
 from siamese_tf_mnist import inference
-from siamese_tf_mnist import visualize
 
-model_save_dir = '../model/mnist'
-model_name = 'model.ckpt-fc'
+model_save_dir = 'model/mnist'
+model_name = 'model.ckpt'
 model_save_path = os.path.join(model_save_dir, model_name)
 # learning_rates = [0.01, 0.001, 0.0001]
 learning_rates = [0.01, 0.001]
@@ -39,7 +39,7 @@ def train_siamese():
     train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
     saver = tf.train.Saver()
 
-    mnist = input_data.read_data_sets('../data/mnist-data', one_hot=False)
+    mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
     test_images = mnist.test.images
     test_labels = mnist.test.labels
     gallery_image = []
