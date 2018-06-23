@@ -60,8 +60,9 @@ def train_siamese():
             break
 
     sess = tf.InteractiveSession()
-    tf.global_variables_initializer().run()
-    if model_snapshot_path is not None:
+    if model_snapshot_path is None:
+        tf.global_variables_initializer().run()
+    else:
         print('Restore parameters from model {}'.format(model_snapshot_path))
         saver.restore(sess, save_path=model_snapshot_path)
 
