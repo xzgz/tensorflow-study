@@ -16,10 +16,14 @@ class Siamese:
         self.x2 = tf.placeholder(tf.float32, [None, 784])
         self.is_training = is_training
 
+        # with self.model_variable_scope() as scope:
+        #     self.o1 = self.cnn_model(self.x1, self.is_training, self.model_variable_scope)
+        #     scope.reuse_variables()
+        #     self.o2 = self.cnn_model(self.x2, self.is_training, self.model_variable_scope)
         with self.model_variable_scope() as scope:
-            self.o1 = self.cnn_model(self.x1, self.is_training, self.model_variable_scope)
+            self.o1 = self.network(self.x1)
             scope.reuse_variables()
-            self.o2 = self.cnn_model(self.x2, self.is_training, self.model_variable_scope)
+            self.o2 = self.network(self.x2)
 
         # Create loss
         self.y_ = tf.placeholder(tf.float32, [None])
@@ -70,6 +74,23 @@ class Siamese:
         # print(params)
 
         return features
+
+    def network(self, x):
+        fc1 = self.fc_layer(x, 1024, "fc1")
+        ac1 = tf.nn.relu(fc1)
+        fc2 = self.fc_layer(ac1, 1024, "fc2")
+        ac2 = tf.nn.relu(fc2)
+        fc3 = self.fc_layer(ac2, 2, "fc3")
+        return fc3
+
+    def fc_layer(self, bottom, n_weight, name):
+        assert len(bottom.get_shape()) == 2
+        n_prev_weight = bottom.get_shape()[1]
+        initer = tf.truncated_normal_initializer(stddev=0.01)
+        W = tf.get_variable(name+'W', dtype=tf.float32, shape=[n_prev_weight, n_weight], initializer=initer)
+        b = tf.get_variable(name+'b', dtype=tf.float32, initializer=tf.constant(0.01, shape=[n_weight], dtype=tf.float32))
+        fc = tf.nn.bias_add(tf.matmul(bottom, W), b)
+        return fc
 
     def loss_with_spring(self):
         margin = 5.0
