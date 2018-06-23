@@ -27,7 +27,8 @@ model_save_dir = 'model/mnist'
 model_name = 'model.ckpt-resnet'
 model_save_path = os.path.join(model_save_dir, model_name)
 # learning_rates = [0.01, 0.001, 0.0001]
-learning_rates = [0.01, 0.001]
+learning_rates = [0.1, 0.01]
+max_iterations = 80000
 boundaries = [40000]
 
 
@@ -67,7 +68,7 @@ def train_siamese():
     print('Initial learning rate:', sess.run(lr))
 
     print('Start train...')
-    for step in range(80000):
+    for step in range(max_iterations):
         iterations = step+1
         batch_x1, batch_y1 = mnist.train.next_batch(128)
         batch_x2, batch_y2 = mnist.train.next_batch(128)
