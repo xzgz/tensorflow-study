@@ -62,7 +62,7 @@ def validate_accuracy():
             print('Test {:d} images'.format(i+1))
     accuracy = correct_count / (test_images_num-100)
     print('accuracy:', accuracy)
-validate_accuracy()
+# validate_accuracy()
 
 
 def predict_single_sample():
@@ -110,6 +110,6 @@ def predict_single_sample():
     # print(tm.reshape([28, 28])[14, :])
     # plt.imshow((tm.reshape([28, 28])*255).astype('uint8'), cmap='gray')
     # plt.show()
-# predict_single_sample()
+predict_single_sample()
 
 
