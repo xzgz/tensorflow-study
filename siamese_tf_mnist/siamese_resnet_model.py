@@ -4,7 +4,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
-from official.resnet import resnet_model
+from siamese_tf_mnist import resnet_model
 import numpy as np
 
 
@@ -48,6 +48,22 @@ class Siamese:
             data_format='channels_first',
             dtype=tf.float32
         )
+        # resnet50_mnist = resnet_model.Model(
+        #     resnet_size=32,                         # resnet_size must be 6n+2, here n=5
+        #     bottleneck=False,
+        #     num_classes=64,
+        #     num_filters=32,
+        #     kernel_size=3,
+        #     conv_stride=1,
+        #     first_pool_size=2,
+        #     first_pool_stride=2,
+        #     block_sizes=[1],
+        #     block_strides=[2],
+        #     final_size=32,
+        #     resnet_version=2,
+        #     data_format='channels_first',
+        #     dtype=tf.float32
+        # )
         features = resnet50_mnist(inputs, is_training, model_variable_scope)
         # params=tf.trainable_variables()
         # print(params)

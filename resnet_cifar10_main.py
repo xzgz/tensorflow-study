@@ -30,8 +30,8 @@ import tensorflow as tf  # pylint: disable=g-bad-import-order
 
 from official.utils.flags import core as flags_core
 from official.utils.logs import logger
-from official.resnet import resnet_model
 from official.resnet import resnet_run_loop
+from siamese_tf_mnist import resnet_model
 
 _HEIGHT = 32
 _WIDTH = 32

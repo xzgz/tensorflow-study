@@ -17,7 +17,6 @@ import numpy as np
 import os
 import sys
 sys.path.insert(0, '/home/gysj/tensorflow-study')
-sys.path.insert(0, '/home/gysj/tensorflow-code/models')
 os.chdir('/home/gysj/tensorflow-study/siamese_tf_mnist')
 
 # import helpers
