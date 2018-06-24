@@ -70,7 +70,7 @@ class Siamese:
             dtype=tf.float32
         )
         features = resnet50_mnist(inputs, is_training, model_variable_scope)
-        # params=tf.trainable_variables()
+        # params = tf.trainable_variables()
         # print(params)
 
         return features

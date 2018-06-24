@@ -138,14 +138,21 @@ def train_siamese_resnet():
 
 
 def train_siamese_resnet50():
-    # prepare data and tf.session
-    # global_step = tf.Variable(0, name='global_step', trainable=False)
-    # global_step = tf.get_variable(name='global_step', shape=None, trainable=False, validate_shape=False)
-    # lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
-    siamese = siamese_resnet_model_50.Siamese(is_training=True)
-    # train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
-    train_step = tf.train.GradientDescentOptimizer(0.1).minimize(siamese.loss)
+    sess = tf.InteractiveSession()
+    tf.global_variables_initializer().run()
     saver = tf.train.Saver()
+    if model_snapshot_path is None:
+        tf.global_variables_initializer().run()
+    else:
+        print('Restore parameters from model {}'.format(model_snapshot_path))
+        saver.restore(sess, save_path=model_snapshot_path)
+    global_step = tf.Variable(0, name='global_step_m', trainable=False)
+    # global_step = tf.get_variable(name='global_step', shape=None, trainable=False, validate_shape=False)
+    lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
+    siamese = siamese_resnet_model_50.Siamese(is_training=True)
+    train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
+    # train_step = tf.train.GradientDescentOptimizer(0.1).minimize(siamese.loss)
+
 
     mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
     test_images = mnist.test.images
@@ -164,15 +171,6 @@ def train_siamese_resnet50():
     gallery_image = siamese_resnet_model_50.format_batch_resnet50(gallery_image)
 
 
-    sess = tf.InteractiveSession()
-    tf.global_variables_initializer().run()
-    if model_snapshot_path is None:
-        tf.global_variables_initializer().run()
-    else:
-        print('Restore parameters from model {}'.format(model_snapshot_path))
-        saver.restore(sess, save_path=model_snapshot_path)
-
-
     batch_size = 128
     print('Start initial test...')
     batch_x1, batch_y1 = mnist.train.next_batch(batch_size)
@@ -184,7 +182,7 @@ def train_siamese_resnet50():
         siamese.x2: batch_x2,
         siamese.y_: batch_y})
     correct_count = 0
-    for i in range(100, test_images_num):  # len(test_images)
+    for i in range(100, 1100):  # len(test_images)
         tm = test_images[i]
         tm = siamese_resnet_model_50.format_batch_resnet50([tm])[0]
         tm = siamese_resnet_model_50.format_single_sample(tm)
@@ -192,10 +190,10 @@ def train_siamese_resnet50():
                                                    siamese.x2: gallery_image})
         if gallery_label[idn] == test_labels[i]:
             correct_count += 1
-    accuracy = correct_count / (test_images_num-100)
+    accuracy = correct_count / (1100-100)
     print('The initial loss:', initial_loss)
-    # print('Global step:', sess.run(global_step))
-    # print('Initial learning rate:', sess.run(lr))
+    print('Global step:', sess.run(global_step))
+    print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
 
 
@@ -207,7 +205,7 @@ def train_siamese_resnet50():
         batch_y = (batch_y1 == batch_y2).astype('float')
         batch_x1, batch_x2 = siamese_resnet_model_50.format_batch_resnet50(batch_x1, batch_x2)
 
-        _, loss_v, gs_v, lr_v = sess.run([train_step, siamese.loss, 0, 0], feed_dict={
+        _, loss_v, gs_v, lr_v = sess.run([train_step, siamese.loss, global_step, lr], feed_dict={
             siamese.x1: batch_x1,
             siamese.x2: batch_x2,
             siamese.y_: batch_y})
