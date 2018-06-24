@@ -27,8 +27,8 @@ class Siamese:
 
         # Create loss
         self.y_ = tf.placeholder(tf.float32, [None])
-        # self.loss = self.loss_with_spring()
-        self.loss = self.loss_cross_entropy()
+        self.loss = self.loss_with_spring()
+        # self.loss = self.loss_cross_entropy()
         self.distance = self.pair_distance()
         self.single_sample_identity = tf.argmax(-self.distance, 0)
 
