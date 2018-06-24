@@ -25,30 +25,30 @@ from siamese_tf_mnist import siamese_resnet_model_50
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-# model_save_dir = 'model/mnist'
-model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
+model_save_dir = 'model/mnist'
+# model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
 
 # model_name = 'model.ckpt-resnet-ce'
 # model_name = 'model.ckpt-resnet'
-model_name = 'model.ckpt-resnet50'
+model_name = 'model.ckpt-resnet50-siamese'
 model_save_path = os.path.join(model_save_dir, model_name)
 
 # snapshot = 'model.ckpt-resnet-92000'
-snapshot = 'variables'
+snapshot = 'model.ckpt-resnet50'
 
-# model_snapshot_path = os.path.join(model_save_dir, snapshot)
-model_snapshot_path = None
+model_snapshot_path = os.path.join(model_save_dir, snapshot)
+# model_snapshot_path = None
 
 # learning_rates = [0.01, 0.001, 0.0001]
 learning_rates = [0.1, 0.01]
-# start_iterations = 92000
-start_iterations = 0
-max_iterations = 240000
-boundaries = [220000]
+start_iterations = 20000
+max_iterations = 30000
+boundaries = [20000]
 
 
 def train_siamese_resnet50():
     siamese = siamese_resnet_model_50.Siamese(is_training=True)
+    global_step = tf.Variable(0, name='global_step', trainable=False)
     sess = tf.InteractiveSession()
     # tf.global_variables_initializer().run()
     saver = tf.train.Saver()
@@ -57,10 +57,9 @@ def train_siamese_resnet50():
     else:
         print('Restore parameters from model {}'.format(model_snapshot_path))
         saver.restore(sess, save_path=model_snapshot_path)
-    global_step = tf.Variable(0, name='global_step', trainable=False)
     # tf.global_variables_initializer().run()
-    init_global_step = tf.variables_initializer([global_step])
-    init_global_step.run()
+    # init_global_step = tf.variables_initializer([global_step])
+    # init_global_step.run()
     # global_step = tf.get_variable(name='global_step', shape=None, trainable=False, validate_shape=False)
     lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
     train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)

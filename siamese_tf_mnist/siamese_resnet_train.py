@@ -48,7 +48,6 @@ boundaries = [220000]
 
 
 def train_siamese_resnet():
-    # prepare data and tf.session
     global_step = tf.Variable(0, name='global_step', trainable=False)
     lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
     siamese = siamese_resnet_model.Siamese(is_training=True)
