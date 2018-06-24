@@ -15,7 +15,7 @@ class Siamese:
         self.x1 = tf.placeholder(tf.float32, [None, 784])
         self.x2 = tf.placeholder(tf.float32, [None, 784])
         self.y_ = tf.placeholder(tf.float32, [None])
-        self.classify_images = self.x1
+        self.classify_images = tf.placeholder(tf.float32, [None, 784])
         self.classify_labels = tf.placeholder(tf.int32, [None])
         self.is_training = is_training
 
