@@ -6,14 +6,15 @@ from __future__ import print_function
 import tensorflow as tf
 from siamese_tf_mnist import resnet_model
 import numpy as np
+import cv2
 
 
 class Siamese:
 
     # Create model
     def __init__(self, is_training):
-        self.x1 = tf.placeholder(tf.float32, [None, 784])
-        self.x2 = tf.placeholder(tf.float32, [None, 784])
+        self.x1 = tf.placeholder(tf.float32, [None, 3, 224, 224])
+        self.x2 = tf.placeholder(tf.float32, [None, 3, 224, 224])
         self.is_training = is_training
 
         # with self.model_variable_scope() as scope:
@@ -35,7 +36,7 @@ class Siamese:
         return tf.variable_scope("siamese")
 
     def cnn_model(self, input_images, is_training, scope_reuse):
-        inputs = tf.reshape(input_images, [-1, 1, 28, 28])
+        # inputs = tf.reshape(input_images, [-1, 1, 28, 28])
         # resnet50_mnist = resnet_model.Model(
         #     resnet_size=32,                         # resnet_size must be 6n+2, here n=5
         #     bottleneck=False,
@@ -142,8 +143,8 @@ class Siamese:
         return distance
 
 
-def format_single_sample(one_data):
-    return np.tile(one_data, (10, 1))
+def format_single_sample(one_image):
+    return np.tile(one_image, (10, 1, 1, 1))
 
 
 

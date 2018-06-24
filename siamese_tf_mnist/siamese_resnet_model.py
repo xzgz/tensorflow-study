@@ -144,6 +144,7 @@ class Siamese:
 
 
 def format_single_sample(one_data):
+
     return np.tile(one_data, (10, 1))
 
 

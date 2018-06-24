@@ -224,5 +224,25 @@ def test_variable_scope():
     print('v:', v.name)
     print('v1:', v1.name)
     assert v1 == v
-test_variable_scope()
+# test_variable_scope()
+
+
+def test_placeholder():
+    x = tf.placeholder(tf.float32, shape=(1024, 1024))
+    y = tf.matmul(x, x)
+    print('x.dtype:', x.dtype)
+    print('y.dtype:', y.dtype)
+
+    with tf.Session() as sess:
+        # print(sess.run(y))                              # ERROR: will fail because x was not fed.
+        rand_array = np.random.rand(1024, 1024)
+        print('x.dtype:', x.dtype)
+        print('y.dtype:', y.dtype)
+        print('rand_array.dtype:', rand_array.dtype)
+        print(sess.run(y, feed_dict={x: rand_array}))   # Will succeed.
+test_placeholder()
+
+
+
+
 
