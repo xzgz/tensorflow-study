@@ -133,7 +133,7 @@ def train_siamese_resnet():
                     correct_count += 1
             accuracy = correct_count / (2100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
-# train_siamese_resnet()
+train_siamese_resnet()
 
 
 
