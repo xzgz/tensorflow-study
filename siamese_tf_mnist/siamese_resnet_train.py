@@ -139,10 +139,12 @@ def train_siamese_resnet():
 
 def train_siamese_resnet50():
     # prepare data and tf.session
-    global_step = tf.Variable(0, name='global_step_m', trainable=False)
+    # global_step = tf.Variable(0, name='global_step', trainable=False)
+    global_step = tf.get_variable(name='global_step')
     lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
     siamese = siamese_resnet_model_50.Siamese(is_training=True)
-    train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
+    # train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
+    train_step = tf.train.GradientDescentOptimizer(0.1).minimize(siamese.loss)
     saver = tf.train.Saver()
 
     mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
@@ -189,7 +191,7 @@ def train_siamese_resnet50():
     accuracy = correct_count / (test_images_num-100)
 
     print('The initial loss:', initial_loss)
-    # print('Global step:', sess.run(global_step))
+    print('Global step:', sess.run(global_step))
     print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
 
@@ -217,7 +219,8 @@ def train_siamese_resnet50():
                 gs_v, iterations, lr_v, loss_v))
 
         if iterations % 100 == 0:
-            saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
+            # saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
+            saver.save(sess=sess, save_path=model_save_path)
 
             print('Start test...')
             correct_count = 0
