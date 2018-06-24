@@ -204,7 +204,7 @@ def train_siamese_resnet50():
         batch_y = (batch_y1 == batch_y2).astype('float')
         batch_x1, batch_x2 = siamese_resnet_model_50.format_pair_batch_resnet50(batch_x1, batch_x2)
 
-        _, loss_v, gs_v, lr_v = sess.run([train_step, siamese.loss, global_step, lr], feed_dict={
+        _, loss_v, gs_v, lr_v = sess.run([train_step, siamese.loss, global_step, 0], feed_dict={
             siamese.x1: batch_x1,
             siamese.x2: batch_x2,
             siamese.y_: batch_y})
