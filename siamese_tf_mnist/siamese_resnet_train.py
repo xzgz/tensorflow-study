@@ -25,6 +25,7 @@ from siamese_tf_mnist import siamese_resnet_model
 from siamese_tf_mnist import siamese_resnet_model_50
 
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 # model_save_dir = 'model/mnist'
 model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
 
@@ -148,8 +149,9 @@ def train_siamese_resnet50():
         print('Restore parameters from model {}'.format(model_snapshot_path))
         saver.restore(sess, save_path=model_snapshot_path)
     global_step = tf.Variable(0, name='global_step', trainable=False)
-    init_global_step = tf.variables_initializer([global_step])
-    init_global_step.run()
+    tf.global_variables_initializer().run()
+    # init_global_step = tf.variables_initializer([global_step])
+    # init_global_step.run()
     # global_step = tf.get_variable(name='global_step', shape=None, trainable=False, validate_shape=False)
     lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
     train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
