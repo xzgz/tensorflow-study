@@ -69,11 +69,10 @@ def validate_accuracy():
 def predict_single_sample():
     mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
     sess = tf.InteractiveSession()
-    tf.global_variables_initializer().run()
-
-    # setup siamese network
     siamese = siamese_resnet_model_v2.Siamese(is_training=False)
     saver = tf.train.Saver()
+    tf.global_variables_initializer().run()
+
     # print('Restore parameters from model {}'.format(model_snapshot_path))
     # saver.restore(sess, save_path=model_snapshot_path)
     test_images = mnist.test.images
