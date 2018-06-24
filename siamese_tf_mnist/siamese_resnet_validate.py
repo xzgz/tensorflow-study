@@ -22,8 +22,10 @@ os.chdir('/home/gysj/tensorflow-study')
 
 from siamese_tf_mnist import siamese_resnet_model_v2
 
-model_save_dir = 'model/mnist'
-snapshot = 'model.ckpt-resnet-98000'
+# model_save_dir = 'model/mnist'
+model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
+# snapshot = 'model.ckpt-resnet-98000'
+snapshot = 'variables'
 model_snapshot_path = os.path.join(model_save_dir, snapshot)
 
 
@@ -73,8 +75,8 @@ def predict_single_sample():
     saver = tf.train.Saver()
     tf.global_variables_initializer().run()
 
-    # print('Restore parameters from model {}'.format(model_snapshot_path))
-    # saver.restore(sess, save_path=model_snapshot_path)
+    print('Restore parameters from model {}'.format(model_snapshot_path))
+    saver.restore(sess, save_path=model_snapshot_path)
     test_images = mnist.test.images
     test_labels = mnist.test.labels
     test_images_num = len(test_images)

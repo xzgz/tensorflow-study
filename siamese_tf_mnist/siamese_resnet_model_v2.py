@@ -54,17 +54,17 @@ class Siamese:
         #     dtype=tf.float32
         # )
         resnet50_mnist = resnet_model.Model(
-            resnet_size=32,                         # resnet_size must be 6n+2, here n=5
-            bottleneck=False,
-            num_classes=10,
-            num_filters=16,
-            kernel_size=3,
-            conv_stride=1,
-            first_pool_size=None,
-            first_pool_stride=None,
-            block_sizes=[5] * 3,
-            block_strides=[1, 2, 2],
-            final_size=64,
+            resnet_size=50,                         # resnet_size must be 6n+2, here n=5
+            bottleneck=True,
+            num_classes=1000,
+            num_filters=64,
+            kernel_size=7,
+            conv_stride=2,
+            first_pool_size=3,
+            first_pool_stride=2,
+            block_sizes=[3, 4, 6, 3],
+            block_strides=[1, 2, 2, 2],
+            final_size=2048,
             resnet_version=2,
             data_format='channels_first',
             dtype=tf.float32
