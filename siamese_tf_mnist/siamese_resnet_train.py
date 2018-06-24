@@ -161,6 +161,8 @@ def train_siamese_resnet50():
                 gallery_image.append(test_images[i])
         else:
             break
+    gallery_image = siamese_resnet_model_50.format_batch_resnet50(gallery_image)
+
 
     sess = tf.InteractiveSession()
     tf.global_variables_initializer().run()
@@ -174,7 +176,7 @@ def train_siamese_resnet50():
     batch_x1, batch_y1 = mnist.train.next_batch(batch_size)
     batch_x2, batch_y2 = mnist.train.next_batch(batch_size)
     batch_y = (batch_y1 == batch_y2).astype('float')
-    batch_x1, batch_x2 = siamese_resnet_model_50.format_pair_batch_resnet50(batch_x1, batch_x2)
+    batch_x1, batch_x2 = siamese_resnet_model_50.format_batch_resnet50(batch_x1, batch_x2)
 
     initial_loss = sess.run(siamese.loss, feed_dict={
         siamese.x1: batch_x1,
@@ -192,7 +194,7 @@ def train_siamese_resnet50():
 
     print('The initial loss:', initial_loss)
     # print('Global step:', sess.run(global_step))
-    print('Initial learning rate:', sess.run(lr))
+    # print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
 
 
@@ -202,7 +204,7 @@ def train_siamese_resnet50():
         batch_x1, batch_y1 = mnist.train.next_batch(128)
         batch_x2, batch_y2 = mnist.train.next_batch(128)
         batch_y = (batch_y1 == batch_y2).astype('float')
-        batch_x1, batch_x2 = siamese_resnet_model_50.format_pair_batch_resnet50(batch_x1, batch_x2)
+        batch_x1, batch_x2 = siamese_resnet_model_50.format_batch_resnet50(batch_x1, batch_x2)
 
         _, loss_v, gs_v, lr_v = sess.run([train_step, siamese.loss, 0, 0], feed_dict={
             siamese.x1: batch_x1,
@@ -226,10 +228,9 @@ def train_siamese_resnet50():
             correct_count = 0
             for i in range(100, 2100):
                 tm = test_images[i]
-                tm = tm.reshape([28, 28])
-                tm = cv2.resize(tm, (224, 224))
-                tm = np.tile(tm, (3, 1, 1))
-                idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model_50.format_single_sample(tm),
+                tm = siamese_resnet_model_50.format_batch_resnet50([tm])[0]
+                tm = siamese_resnet_model_50.format_single_sample(tm)
+                idn = siamese.single_sample_identity.eval({siamese.x1: tm,
                                                            siamese.x2: gallery_image})
                 if gallery_label[idn] == test_labels[i]:
                     correct_count += 1

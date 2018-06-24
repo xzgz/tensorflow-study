@@ -148,20 +148,28 @@ def format_single_sample(one_image):
     return np.tile(one_image, (10, 1, 1, 1))
 
 
-def format_pair_batch_resnet50(batch1, batch2):
+def format_batch_resnet50(batch1, batch2=None):
     temp_x1 = []
     temp_x2 = []
-    for i, im in enumerate(batch1):
-        im = im.reshape([28, 28])
-        im = cv2.resize(im, (224, 224))
-        im = np.tile(im, (3, 1, 1))
-        temp_x1.append(im)
-        im = batch2[i]
-        im = im.reshape([28, 28])
-        im = cv2.resize(im, (224, 224))
-        im = np.tile(im, (3, 1, 1))
-        temp_x2.append(im)
-    return temp_x1, temp_x2
+    if batch2 is None:
+        for im in batch1:
+            im = im.reshape([28, 28])
+            im = cv2.resize(im, (224, 224))
+            im = np.tile(im, (3, 1, 1))
+            temp_x1.append(im)
+        return temp_x1
+    else:
+        for i, im in enumerate(batch1):
+            im = im.reshape([28, 28])
+            im = cv2.resize(im, (224, 224))
+            im = np.tile(im, (3, 1, 1))
+            temp_x1.append(im)
+            im = batch2[i]
+            im = im.reshape([28, 28])
+            im = cv2.resize(im, (224, 224))
+            im = np.tile(im, (3, 1, 1))
+            temp_x2.append(im)
+        return temp_x1, temp_x2
 
 
 
