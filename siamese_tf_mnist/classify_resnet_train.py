@@ -111,7 +111,7 @@ def train_classify_resnet():
 
             print('Start test...')
             predict_labels = siamese.predicted_labels.eval({siamese.classify_images: test_images})
-            correct_count = (predict_labels == test_labels).astype('int32')
+            correct_index = (predict_labels == test_labels).astype('int32')
             accuracy = np.sum(correct_index)/float(total_count)
             print('Test accuracy: {:.4f}'.format(accuracy))
 train_classify_resnet()
