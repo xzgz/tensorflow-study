@@ -16,20 +16,29 @@ import tensorflow as tf
 import numpy as np
 import os
 import sys
+import cv2
 root = '/home/gysj/tensorflow-study'
 sys.path.insert(0, root)
 os.chdir(root)
 
 from siamese_tf_mnist import siamese_resnet_model
+from siamese_tf_mnist import siamese_resnet_model_50
 
 
-model_save_dir = 'model/mnist'
-model_name = 'model.ckpt-resnet-ce'
+# model_save_dir = 'model/mnist'
+model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
+
+# model_name = 'model.ckpt-resnet-ce'
 # model_name = 'model.ckpt-resnet'
-snapshot = 'model.ckpt-resnet-92000'
+model_name = 'model.ckpt-resnet50'
 model_save_path = os.path.join(model_save_dir, model_name)
-# model_snapshot_path = os.path.join(model_save_dir, snapshot)
-model_snapshot_path = None
+
+# snapshot = 'model.ckpt-resnet-92000'
+snapshot = 'variables'
+
+model_snapshot_path = os.path.join(model_save_dir, snapshot)
+# model_snapshot_path = None
+
 # learning_rates = [0.01, 0.001, 0.0001]
 learning_rates = [0.1, 0.01]
 # start_iterations = 92000
@@ -132,7 +141,7 @@ def train_siamese_resnet50():
     # prepare data and tf.session
     global_step = tf.Variable(0, name='global_step', trainable=False)
     lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
-    siamese = siamese_resnet_model.Siamese(is_training=True)
+    siamese = siamese_resnet_model_50.Siamese(is_training=True)
     train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
     saver = tf.train.Saver()
 
@@ -162,10 +171,7 @@ def train_siamese_resnet50():
     batch_x1, batch_y1 = mnist.train.next_batch(batch_size)
     batch_x2, batch_y2 = mnist.train.next_batch(batch_size)
     batch_y = (batch_y1 == batch_y2).astype('float')
-    temp_x1 = []
-    temp_x2 = []
-    for im in batch_x1:
-
+    batch_x1, batch_x2 = siamese_resnet_model_50.format_pair_batch_resnet50(batch_x1, batch_x2)
 
     initial_loss = sess.run(siamese.loss, feed_dict={
         siamese.x1: batch_x1,
@@ -193,6 +199,7 @@ def train_siamese_resnet50():
         batch_x1, batch_y1 = mnist.train.next_batch(128)
         batch_x2, batch_y2 = mnist.train.next_batch(128)
         batch_y = (batch_y1 == batch_y2).astype('float')
+        batch_x1, batch_x2 = siamese_resnet_model_50.format_pair_batch_resnet50(batch_x1, batch_x2)
 
         _, loss_v, gs_v, lr_v = sess.run([train_step, siamese.loss, global_step, lr], feed_dict={
             siamese.x1: batch_x1,
@@ -202,20 +209,23 @@ def train_siamese_resnet50():
         if np.isnan(loss_v):
             print('Model diverged with loss = NaN')
             quit()
-        if iterations % 500 == 0:
+        if iterations % 100 == 0:
             # print('batch_y:\n', batch_y)
             # print('step %d: loss %.3f' % (iterations, loss_v))
             print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.4f}'.format(
                 gs_v, iterations, lr_v, loss_v))
 
-        if iterations % 2000 == 0:
+        if iterations % 100 == 0:
             saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
 
             print('Start test...')
             correct_count = 0
             for i in range(100, 2100):
                 tm = test_images[i]
-                idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
+                tm = tm.reshape([28, 28])
+                tm = cv2.resize(tm, (224, 224))
+                tm = np.tile(tm, (3, 1, 1))
+                idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model_50.format_single_sample(tm),
                                                            siamese.x2: gallery_image})
                 if gallery_label[idn] == test_labels[i]:
                     correct_count += 1
