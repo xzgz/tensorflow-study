@@ -17,8 +17,9 @@ import numpy as np
 import os
 import sys
 import cv2
-sys.path.insert(0, '/home/gysj/tensorflow-study')
-os.chdir('/home/gysj/tensorflow-study')
+# sys.path.insert(0, '/home/gysj/tensorflow-study')
+# os.chdir('/home/gysj/tensorflow-study')
+os.chdir('/media/xzgz/Ubuntu/Ubuntu/Code/tensorflow-study')
 
 from siamese_tf_mnist import siamese_resnet_model_50
 
@@ -71,7 +72,7 @@ def validate_accuracy():
             print('Test {:d} images'.format(i+1))
     accuracy = correct_count / (test_images_num-100)
     print('accuracy:', accuracy)
-validate_accuracy()
+# validate_accuracy()
 
 
 def predict_single_sample():
@@ -131,36 +132,43 @@ def predict_single_sample():
 def some_test():
     import cv2
     mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
+    batch_x1, batch_y1 = mnist.train.next_batch(100)
+    batch_x2, batch_y2 = mnist.train.next_batch(100)
+    batch_y = (batch_y1 == batch_y2)
+    print(batch_y)
+    for i in batch_y:
+        if not i:
+            print('false')
     test_images = mnist.test.images
     test_labels = mnist.test.labels
-    test_images_num = len(test_images)
-    print('There are {} test images.'.format(test_images_num))
-    print('test_images:', test_images.shape, test_images.dtype)
-    print('test_labels:', test_labels.shape, test_labels.dtype)
-    gallery_image = []
-    gallery_label = []
-    for i in range(100):
-        if len(gallery_image) != 10:
-            if test_labels[i] not in gallery_label:
-                im = test_images[i].reshape([28, 28])
-                im = cv2.resize(im, (224, 224))
-                im = np.tile(im, (3, 1, 1))
-                gallery_image.append(im)
-                gallery_label.append(test_labels[i])
-        else:
-            break
-    print('gallery_image shape:', np.array(gallery_image).shape)
-    tm = test_images[121]
-    tm = tm.reshape([28, 28])
-    tm = cv2.resize(tm, (224, 224))
-    tm = np.tile(tm, (3, 1, 1))
-    tm = np.tile(tm, (10, 1, 1, 1))
-    # tm = tm.transpose((1, 2, 0))
-    print('tm:', tm.shape, tm.dtype)
-    # print(tm[200, :, 1])
-    plt.imshow(tm[3].transpose((1, 2, 0)))
-    plt.show()
-# some_test()
+    # test_images_num = len(test_images)
+    # print('There are {} test images.'.format(test_images_num))
+    # print('test_images:', test_images.shape, test_images.dtype)
+    # print('test_labels:', test_labels.shape, test_labels.dtype)
+    # gallery_image = []
+    # gallery_label = []
+    # for i in range(100):
+    #     if len(gallery_image) != 10:
+    #         if test_labels[i] not in gallery_label:
+    #             im = test_images[i].reshape([28, 28])
+    #             im = cv2.resize(im, (224, 224))
+    #             im = np.tile(im, (3, 1, 1))
+    #             gallery_image.append(im)
+    #             gallery_label.append(test_labels[i])
+    #     else:
+    #         break
+    # print('gallery_image shape:', np.array(gallery_image).shape)
+    # tm = test_images[121]
+    # tm = tm.reshape([28, 28])
+    # tm = cv2.resize(tm, (224, 224))
+    # tm = np.tile(tm, (3, 1, 1))
+    # tm = np.tile(tm, (10, 1, 1, 1))
+    # # tm = tm.transpose((1, 2, 0))
+    # print('tm:', tm.shape, tm.dtype)
+    # # print(tm[200, :, 1])
+    # plt.imshow(tm[3].transpose((1, 2, 0)))
+    # plt.show()
+some_test()
 
 
 

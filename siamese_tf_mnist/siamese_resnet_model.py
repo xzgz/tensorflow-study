@@ -179,4 +179,45 @@ def format_single_sample(one_data):
     return np.tile(one_data, (10, 1))
 
 
+def generate_train_samples(mnist, batch_size, positive_rate):
+    pos_cnt = int(batch_size*positive_rate)
+    neg_cnt = batch_size - pos_cnt
+    pos_num = 0
+    neg_num = 0
+
+    batch1 = []
+    batch2 = []
+    labels = []
+    while pos_num != pos_cnt:
+        batch_x1, batch_y1 = mnist.train.next_batch(100)
+        batch_x2, batch_y2 = mnist.train.next_batch(100)
+        batch_y = (batch_y1 == batch_y2)
+        for i, v in enumerate(batch_y):
+            if v:
+                batch1.append(batch_x1[i])
+                batch2.append(batch_x2[i])
+                labels.append(batch_y[i])
+            pos_num += 1
+            if pos_num == pos_cnt:
+                break
+    while neg_num != neg_cnt:
+        batch_x1, batch_y1 = mnist.train.next_batch(100)
+        batch_x2, batch_y2 = mnist.train.next_batch(100)
+        batch_y = (batch_y1 == batch_y2)
+        for i, v in enumerate(batch_y):
+            if not v:
+                batch1.append(batch_x1[i])
+                batch2.append(batch_x2[i])
+                labels.append(batch_y[i])
+            neg_num += 1
+            if neg_num == neg_cnt:
+                break
+    batch_y = np.array(batch_y).astype('float32')
+
+    return batch1, batch2, batch_y
+
+
+
+
+
 
