@@ -82,7 +82,7 @@ def train_classify_resnet():
     correct_index = (predict_labels == test_labels).astype('int32')
     total_count = len(correct_index)
     accuracy = np.sum(correct_index)/float(total_count)
-    print('The initial loss:', initial_loss)
+    print('The initial loss: {:.8f}'.format(initial_loss))
     print('Global step:', sess.run(global_step))
     print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
@@ -103,7 +103,7 @@ def train_classify_resnet():
         if iterations % 500 == 0:
             # print('batch_y:\n', batch_y)
             # print('step %d: loss %.3f' % (iterations, loss_v))
-            print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.4f}'.format(
+            print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.8f}'.format(
                 gs_v, iterations, lr_v, loss_v))
 
         if iterations % 2000 == 0:
