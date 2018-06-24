@@ -79,7 +79,7 @@ def predict_single_sample():
     sess = tf.InteractiveSession()
     siamese = siamese_resnet_model_50.Siamese(is_training=False)
     saver = tf.train.Saver()
-    # tf.global_variables_initializer().run()
+    tf.global_variables_initializer().run()
     #
     # print('Restore parameters from model {}'.format(model_snapshot_path))
     # saver.restore(sess, save_path=model_snapshot_path)
