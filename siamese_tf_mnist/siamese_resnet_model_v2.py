@@ -56,7 +56,7 @@ class Siamese:
         resnet50_mnist = resnet_model.Model(
             resnet_size=50,                         # resnet_size must be 6n+2, here n=5
             bottleneck=True,
-            num_classes=1000,
+            num_classes=1001,
             num_filters=64,
             kernel_size=7,
             conv_stride=2,
