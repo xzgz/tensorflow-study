@@ -19,8 +19,10 @@ class Siamese:
         self.classify_labels = tf.placeholder(tf.int32, [None])
         self.is_training = is_training
 
-        self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
-        self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
+        self.o1 = None
+        self.o2 = None
+        # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
+        # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.network(self.x1)
         #     scope.reuse_variables()
