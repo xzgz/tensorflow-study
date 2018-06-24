@@ -48,7 +48,6 @@ boundaries = [20000]
 
 def train_siamese_resnet50():
     siamese = siamese_resnet_model_50.Siamese(is_training=True)
-    global_step = tf.Variable(0, name='global_step', trainable=False)
     sess = tf.InteractiveSession()
     # tf.global_variables_initializer().run()
     saver = tf.train.Saver()
@@ -58,8 +57,9 @@ def train_siamese_resnet50():
         print('Restore parameters from model {}'.format(model_snapshot_path))
         saver.restore(sess, save_path=model_snapshot_path)
     # tf.global_variables_initializer().run()
-    # init_global_step = tf.variables_initializer([global_step])
-    # init_global_step.run()
+    global_step = tf.Variable(start_iterations, name='global_step', trainable=False)
+    init_global_step = tf.variables_initializer([global_step])
+    init_global_step.run()
     # global_step = tf.get_variable(name='global_step', shape=None, trainable=False, validate_shape=False)
     lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
     train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
