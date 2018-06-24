@@ -32,9 +32,8 @@ class Siamese:
         self.distance = self.pair_distance()
         self.single_sample_identity = tf.argmax(-self.distance, 0)
         # self.classify_features = self.cnn_classify_model(self.classify_images, self.is_training, scope_reuse=False)
-        self.classify_features = None
-        self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
-        self.predicted_labels = self.classify_predict(self.classify_features)
+        # self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
+        # self.predicted_labels = self.classify_predict(self.classify_features)
 
     def model_variable_scope(self):
         return tf.variable_scope("siamese")
