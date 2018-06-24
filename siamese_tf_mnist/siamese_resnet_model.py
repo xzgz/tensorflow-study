@@ -25,12 +25,13 @@ class Siamese:
         #     self.o1 = self.network(self.x1)
         #     scope.reuse_variables()
         #     self.o2 = self.network(self.x2)
+        self.inner_product = tf.reduce_sum(tf.multiply(self.o1, self.o2), axis=1)
+        self.loss = self.loss_cross_entropy(self.inner_product)
+        self.single_sample_identity = tf.argmax(self.inner_product, 0)
+        # self.loss = self.loss_with_spring()
+        # self.distance = self.pair_distance()
+        # self.single_sample_identity = tf.argmax(-self.distance, 0)
 
-        # Create loss
-        self.loss = self.loss_with_spring()
-        # self.loss = self.loss_cross_entropy()
-        self.distance = self.pair_distance()
-        self.single_sample_identity = tf.argmax(-self.distance, 0)
         # self.classify_features = self.cnn_classify_model(self.classify_images, self.is_training, scope_reuse=False)
         # self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
         # self.predicted_labels = self.classify_predict(self.classify_features)
@@ -146,9 +147,7 @@ class Siamese:
         loss = tf.reduce_mean(losses, name="loss")
         return loss
 
-    def loss_cross_entropy(self):
-        inner_product = tf.multiply(self.o1, self.o2)
-        inner_product = tf.reduce_sum(inner_product, axis=1)
+    def loss_cross_entropy(self, inner_product):
         losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
         loss = tf.reduce_mean(losses, name='siamese_loss')
         # tf.nn.softmax_cross_entropy_with_logits()

@@ -81,7 +81,7 @@ def train_siamese_resnet():
     batch_x1, batch_y1 = mnist.train.next_batch(128)
     batch_x2, batch_y2 = mnist.train.next_batch(128)
     batch_y = (batch_y1 == batch_y2).astype('float')
-    initial_loss = sess.run(siamese.loss, feed_dict={
+    inner_product, initial_loss = sess.run([siamese.inner_product, siamese.loss], feed_dict={
         siamese.x1: batch_x1,
         siamese.x2: batch_x2,
         siamese.y_: batch_y})
@@ -99,6 +99,7 @@ def train_siamese_resnet():
     print('Global step:', sess.run(global_step))
     print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
+    print('inner_product:', inner_product)
 
 
     print('Start train...')
@@ -108,7 +109,7 @@ def train_siamese_resnet():
         batch_x2, batch_y2 = mnist.train.next_batch(128)
         batch_y = (batch_y1 == batch_y2).astype('float')
 
-        _, loss_v, gs_v, lr_v = sess.run([train_step, siamese.loss, global_step, lr], feed_dict={
+        _, loss_v, gs_v, lr_v, inner_product = sess.run([train_step, siamese.loss, global_step, lr, siamese.inner_product], feed_dict={
             siamese.x1: batch_x1,
             siamese.x2: batch_x2,
             siamese.y_: batch_y})
@@ -121,6 +122,7 @@ def train_siamese_resnet():
             # print('step %d: loss %.3f' % (iterations, loss_v))
             print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.4f}'.format(
                 gs_v, iterations, lr_v, loss_v))
+            print('inner_product:', inner_product)
 
         if iterations % 2000 == 0:
             saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
