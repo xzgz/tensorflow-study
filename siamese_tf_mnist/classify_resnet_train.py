@@ -66,6 +66,10 @@ def train_classify_resnet():
     test_labels = mnist.test.labels
     test_images_num = len(test_images)
     print('There are {} test images.'.format(test_images_num))
+    print('test_images:', test_images.shape, test_images.dtype)
+    print('test_labels:', test_labels.shape, test_labels.dtype)
+    test_labels = np.asarray(test_labels, np.int32)
+    print('transformed test_labels:', test_labels.shape, test_labels.dtype)
 
 
     batch_size = 128
