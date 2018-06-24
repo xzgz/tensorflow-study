@@ -30,7 +30,7 @@ model_save_dir = 'model/mnist'
 
 # model_name = 'model.ckpt-resnet-ce'
 # model_name = 'model.ckpt-resnet'
-model_name = 'model.ckpt-resnet32-siamese'
+model_name = 'model.ckpt-resnet32-siamese-fc10'
 model_save_path = os.path.join(model_save_dir, model_name)
 
 # snapshot = 'model.ckpt-resnet-92000'
@@ -73,7 +73,9 @@ def train_siamese_resnet():
     if model_snapshot_path is None:
         tf.global_variables_initializer().run()
     else:
+        print('*******************************************')
         print('Restore parameters from model {}'.format(model_snapshot_path))
+        print('*******************************************')
         saver.restore(sess, save_path=model_snapshot_path)
 
     batch_x1, batch_y1 = mnist.train.next_batch(128)

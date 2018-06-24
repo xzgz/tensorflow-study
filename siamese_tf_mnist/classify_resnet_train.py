@@ -57,7 +57,9 @@ def train_classify_resnet():
     if model_snapshot_path is None:
         tf.global_variables_initializer().run()
     else:
+        print('*******************************************')
         print('Restore parameters from model {}'.format(model_snapshot_path))
+        print('*******************************************')
         saver.restore(sess, save_path=model_snapshot_path)
 
 
