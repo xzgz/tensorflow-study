@@ -36,8 +36,8 @@ model_save_path = os.path.join(model_save_dir, model_name)
 # snapshot = 'model.ckpt-resnet-92000'
 snapshot = 'variables'
 
-model_snapshot_path = os.path.join(model_save_dir, snapshot)
-# model_snapshot_path = None
+# model_snapshot_path = os.path.join(model_save_dir, snapshot)
+model_snapshot_path = None
 
 # learning_rates = [0.01, 0.001, 0.0001]
 learning_rates = [0.1, 0.01]
