@@ -173,7 +173,7 @@ def train_siamese_resnet50():
     gallery_image = siamese_resnet_model_50.format_batch_resnet50(gallery_image)
 
 
-    batch_size = 128
+    batch_size = 32
     print('Start initial test...')
     batch_x1, batch_y1 = mnist.train.next_batch(batch_size)
     batch_x2, batch_y2 = mnist.train.next_batch(batch_size)
