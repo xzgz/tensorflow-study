@@ -20,7 +20,7 @@ import cv2
 sys.path.insert(0, '/home/gysj/tensorflow-study')
 os.chdir('/home/gysj/tensorflow-study')
 
-from siamese_tf_mnist import siamese_resnet_model_v2
+from siamese_tf_mnist import siamese_resnet_model_50
 
 # model_save_dir = 'model/mnist'
 model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
@@ -32,10 +32,10 @@ model_snapshot_path = os.path.join(model_save_dir, snapshot)
 def validate_accuracy():
     mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
     sess = tf.InteractiveSession()
-
-    # setup siamese network
-    siamese = siamese_resnet_model_v2.Siamese(is_training=False)
+    siamese = siamese_resnet_model_50.Siamese(is_training=False)
     saver = tf.train.Saver()
+    tf.global_variables_initializer().run()
+
     print('Restore parameters from model {}'.format(model_snapshot_path))
     saver.restore(sess, save_path=model_snapshot_path)
     test_images = mnist.test.images
@@ -49,15 +49,21 @@ def validate_accuracy():
     for i in range(100):
         if len(gallery_image) != 10:
             if test_labels[i] not in gallery_label:
+                im = test_images[i].reshape([28, 28])
+                im = cv2.resize(im, (224, 224))
+                im = np.tile(im, (3, 1, 1))
+                gallery_image.append(im)
                 gallery_label.append(test_labels[i])
-                gallery_image.append(test_images[i])
         else:
             break
 
     correct_count = 0
     for i in range(100, test_images_num):
         tm = test_images[i]
-        idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model_v2.format_single_sample(tm),
+        tm = tm.reshape([28, 28])
+        tm = cv2.resize(tm, (224, 224))
+        tm = np.tile(tm, (3, 1, 1))
+        idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model_50.format_single_sample(tm),
                                                    siamese.x2: gallery_image})
         if gallery_label[idn] == test_labels[i]:
             correct_count += 1
@@ -71,12 +77,12 @@ def validate_accuracy():
 def predict_single_sample():
     mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
     sess = tf.InteractiveSession()
-    siamese = siamese_resnet_model_v2.Siamese(is_training=False)
+    siamese = siamese_resnet_model_50.Siamese(is_training=False)
     saver = tf.train.Saver()
-    tf.global_variables_initializer().run()
-
-    print('Restore parameters from model {}'.format(model_snapshot_path))
-    saver.restore(sess, save_path=model_snapshot_path)
+    # tf.global_variables_initializer().run()
+    #
+    # print('Restore parameters from model {}'.format(model_snapshot_path))
+    # saver.restore(sess, save_path=model_snapshot_path)
     test_images = mnist.test.images
     test_labels = mnist.test.labels
     test_images_num = len(test_images)
@@ -108,9 +114,9 @@ def predict_single_sample():
     tm = tm.reshape([28, 28])
     tm = cv2.resize(tm, (224, 224))
     tm = np.tile(tm, (3, 1, 1))
-    distance = siamese.distance.eval({siamese.x1: siamese_resnet_model_v2.format_single_sample(tm),
+    distance = siamese.distance.eval({siamese.x1: siamese_resnet_model_50.format_single_sample(tm),
                                       siamese.x2: gallery_image})
-    idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model_v2.format_single_sample(tm),
+    idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model_50.format_single_sample(tm),
                                                siamese.x2: gallery_image})
     print(idn, type(idn))
     print('predict label:', gallery_label[idn])
