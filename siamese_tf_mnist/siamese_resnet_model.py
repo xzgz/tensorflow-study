@@ -212,7 +212,7 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             neg_num += 1
             if neg_num == neg_cnt:
                 break
-    batch_y = np.array(batch_y).astype('float32')
+    batch_y = np.array(labels).astype('float32')
 
     return batch1, batch2, batch_y
 
