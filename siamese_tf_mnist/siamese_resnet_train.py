@@ -147,7 +147,7 @@ def train_siamese_resnet50():
     else:
         print('Restore parameters from model {}'.format(model_snapshot_path))
         saver.restore(sess, save_path=model_snapshot_path)
-    global_step = tf.Variable(0, name='global_step_m', trainable=False)
+    global_step = tf.Variable(0, name='global_step', trainable=False)
     init_global_step = tf.variables_initializer([global_step])
     init_global_step.run()
     # global_step = tf.get_variable(name='global_step', shape=None, trainable=False, validate_shape=False)
@@ -221,13 +221,13 @@ def train_siamese_resnet50():
             print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.4f}'.format(
                 gs_v, iterations, lr_v, loss_v))
 
-        if iterations % 100 == 0:
+        if iterations % 500 == 0:
             # saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
             saver.save(sess=sess, save_path=model_save_path)
 
             print('Start test...')
             correct_count = 0
-            for i in range(100, 2100):
+            for i in range(100, 1100):
                 tm = test_images[i]
                 tm = siamese_resnet_model_50.format_batch_resnet50([tm])[0]
                 tm = siamese_resnet_model_50.format_single_sample(tm)
@@ -235,7 +235,7 @@ def train_siamese_resnet50():
                                                            siamese.x2: gallery_image})
                 if gallery_label[idn] == test_labels[i]:
                     correct_count += 1
-            accuracy = correct_count / (2100-100)
+            accuracy = correct_count / (1100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
 train_siamese_resnet50()
 
