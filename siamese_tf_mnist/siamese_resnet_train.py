@@ -139,7 +139,7 @@ def train_siamese_resnet():
 
 def train_siamese_resnet50():
     # prepare data and tf.session
-    global_step = tf.Variable(0, name='global_step', trainable=False)
+    global_step = tf.Variable(name='global_step', trainable=False)
     # lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
     siamese = siamese_resnet_model_50.Siamese(is_training=True)
     train_step = tf.train.GradientDescentOptimizer(0.1).minimize(siamese.loss, global_step=global_step)
