@@ -24,13 +24,13 @@ os.chdir(root)
 from siamese_tf_mnist import siamese_resnet_model
 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-# model_save_dir = 'model/mnist'
-model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+model_save_dir = 'model/mnist'
+# model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
 
 # model_name = 'model.ckpt-resnet-ce'
 # model_name = 'model.ckpt-resnet'
-model_name = 'model.ckpt-resnet50'
+model_name = 'model.ckpt-resnet32-classify'
 model_save_path = os.path.join(model_save_dir, model_name)
 
 # snapshot = 'model.ckpt-resnet-92000'
@@ -43,33 +43,16 @@ model_snapshot_path = os.path.join(model_save_dir, snapshot)
 learning_rates = [0.1, 0.01]
 # start_iterations = 92000
 start_iterations = 0
-max_iterations = 240000
-boundaries = [220000]
+max_iterations = 40000
+boundaries = [30000]
 
 
-def train_siamese_resnet():
-    # prepare data and tf.session
+def train_classify_resnet():
     global_step = tf.Variable(0, name='global_step', trainable=False)
     lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
     siamese = siamese_resnet_model.Siamese(is_training=True)
-    train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
+    train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.classify_loss, global_step=global_step)
     saver = tf.train.Saver()
-
-    mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
-    test_images = mnist.test.images
-    test_labels = mnist.test.labels
-    test_images_num = len(test_images)
-    print('There are {} test images.'.format(test_images_num))
-    gallery_image = []
-    gallery_label = []
-    for i in range(100):
-        if len(gallery_image) != 10:
-            if test_labels[i] not in gallery_label:
-                gallery_label.append(test_labels[i])
-                gallery_image.append(test_images[i])
-        else:
-            break
-
     sess = tf.InteractiveSession()
     if model_snapshot_path is None:
         tf.global_variables_initializer().run()
@@ -77,40 +60,36 @@ def train_siamese_resnet():
         print('Restore parameters from model {}'.format(model_snapshot_path))
         saver.restore(sess, save_path=model_snapshot_path)
 
-    batch_x1, batch_y1 = mnist.train.next_batch(128)
-    batch_x2, batch_y2 = mnist.train.next_batch(128)
-    batch_y = (batch_y1 == batch_y2).astype('float')
-    initial_loss = sess.run(siamese.loss, feed_dict={
-        siamese.x1: batch_x1,
-        siamese.x2: batch_x2,
-        siamese.y_: batch_y})
 
-    correct_count = 0
-    for i in range(100, test_images_num):  # len(test_images)
-        tm = test_images[i]
-        idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
-                                                   siamese.x2: gallery_image})
-        if gallery_label[idn] == test_labels[i]:
-            correct_count += 1
-    accuracy = correct_count / (test_images_num-100)
+    mnist = input_data.read_data_sets('data/mnist-data', one_hot=False)
+    test_images = mnist.test.images
+    test_labels = mnist.test.labels
+    test_images_num = len(test_images)
+    print('There are {} test images.'.format(test_images_num))
 
+
+    batch_size = 128
+    batch_images, batch_labels = mnist.train.next_batch(batch_size)
+    batch_labels = np.asarray(batch_labels, dtype=np.int32)
+    initial_loss = sess.run(siamese.classify_loss, feed_dict={
+        siamese.classify_images: batch_images,
+        siamese.classify_labels: batch_labels})
+    predict_labels = siamese.predicted_labels.eval({siamese.classify_images: test_images})
+    correct_count = (predict_labels == test_labels).astype('int32')
     print('The initial loss:', initial_loss)
     print('Global step:', sess.run(global_step))
     print('Initial learning rate:', sess.run(lr))
-    print('Initial accuracy: {:.4f}'.format(accuracy))
+    print('Initial accuracy: {:.4f}'.format(correct_count))
 
 
     print('Start train...')
     for step in range(start_iterations, max_iterations):
         iterations = step+1
-        batch_x1, batch_y1 = mnist.train.next_batch(128)
-        batch_x2, batch_y2 = mnist.train.next_batch(128)
-        batch_y = (batch_y1 == batch_y2).astype('float')
-
-        _, loss_v, gs_v, lr_v = sess.run([train_step, siamese.loss, global_step, lr], feed_dict={
-            siamese.x1: batch_x1,
-            siamese.x2: batch_x2,
-            siamese.y_: batch_y})
+        batch_images, batch_labels = mnist.train.next_batch(batch_size)
+        batch_labels = np.asarray(batch_labels, dtype=np.int32)
+        _, loss_v, gs_v, lr_v = sess.run([train_step, siamese.classify_loss, global_step, lr], feed_dict={
+            siamese.classify_images: batch_images,
+            siamese.classify_labels: batch_labels})
 
         if np.isnan(loss_v):
             print('Model diverged with loss = NaN')
@@ -125,16 +104,10 @@ def train_siamese_resnet():
             saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
 
             print('Start test...')
-            correct_count = 0
-            for i in range(100, 2100):
-                tm = test_images[i]
-                idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
-                                                           siamese.x2: gallery_image})
-                if gallery_label[idn] == test_labels[i]:
-                    correct_count += 1
-            accuracy = correct_count / (2100-100)
-            print('Test accuracy: {:.4f}'.format(accuracy))
-# train_siamese_resnet()
+            predict_labels = siamese.predicted_labels.eval({siamese.classify_images: test_images})
+            correct_count = (predict_labels == test_labels).astype('int32')
+            print('Test accuracy: {:.4f}'.format(correct_count))
+train_classify_resnet()
 
 
 

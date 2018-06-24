@@ -492,7 +492,6 @@ class Model(object):
       A logits Tensor with shape [<batch_size>, self.num_classes].
     """
 
-    # with model_variable_scope():
     with self._model_variable_scope() as scope:
         if scope_reuse:
             scope.reuse_variables()
@@ -548,7 +547,7 @@ class Model(object):
 
         inputs = tf.reshape(inputs, [-1, self.final_size])
         # inputs = tf.layers.dense(inputs=inputs, units=1024)
-        # inputs = tf.layers.dense(inputs=inputs, units=self.num_classes)
+        inputs = tf.layers.dense(inputs=inputs, units=self.num_classes)
         inputs = tf.identity(inputs, 'final_dense')
         return inputs
 

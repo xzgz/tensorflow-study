@@ -14,28 +14,31 @@ class Siamese:
     def __init__(self, is_training):
         self.x1 = tf.placeholder(tf.float32, [None, 784])
         self.x2 = tf.placeholder(tf.float32, [None, 784])
+        self.y_ = tf.placeholder(tf.float32, [None])
+        self.classify_images = self.x1
+        self.classify_labels = tf.placeholder(tf.int32, [None])
         self.is_training = is_training
 
-        with self.model_variable_scope() as scope:
-            self.o1 = self.cnn_model(self.x1, self.is_training, self.model_variable_scope)
-            scope.reuse_variables()
-            self.o2 = self.cnn_model(self.x2, self.is_training, self.model_variable_scope)
+        self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
+        self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.network(self.x1)
         #     scope.reuse_variables()
         #     self.o2 = self.network(self.x2)
 
         # Create loss
-        self.y_ = tf.placeholder(tf.float32, [None])
         # self.loss = self.loss_with_spring()
         self.loss = self.loss_cross_entropy()
         self.distance = self.pair_distance()
         self.single_sample_identity = tf.argmax(-self.distance, 0)
+        self.classify_features = self.cnn_classify_model(self.classify_images, self.is_training, scope_reuse=False)
+        self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
+        self.predicted_labels = self.classify_predict(self.classify_labels)
 
     def model_variable_scope(self):
         return tf.variable_scope("siamese")
 
-    def cnn_model(self, input_images, is_training, model_variable_scope):
+    def cnn_model(self, input_images, is_training, scope_reuse):
         inputs = tf.reshape(input_images, [-1, 1, 28, 28])
         # resnet50_mnist = resnet_model.Model(
         #     resnet_size=32,                         # resnet_size must be 6n+2, here n=5
@@ -69,10 +72,30 @@ class Siamese:
             data_format='channels_first',
             dtype=tf.float32
         )
-        features = resnet50_mnist(inputs, is_training, model_variable_scope)
+        features = resnet50_mnist(inputs, is_training, scope_reuse)
         # params = tf.trainable_variables()
         # print(params)
+        return features
 
+    def cnn_classify_model(self, input_images, is_training, scope_reuse):
+        inputs = tf.reshape(input_images, [-1, 1, 28, 28])
+        resnet50_mnist = resnet_model.Model(
+            resnet_size=32,                         # resnet_size must be 6n+2, here n=5
+            bottleneck=False,
+            num_classes=10,
+            num_filters=16,
+            kernel_size=3,
+            conv_stride=1,
+            first_pool_size=None,
+            first_pool_stride=None,
+            block_sizes=[5] * 3,
+            block_strides=[1, 2, 2],
+            final_size=64,
+            resnet_version=2,
+            data_format='channels_first',
+            dtype=tf.float32
+        )
+        features = resnet50_mnist(inputs, is_training, scope_reuse)
         return features
 
     def network(self, x):
@@ -127,9 +150,18 @@ class Siamese:
         inner_product = tf.multiply(self.o1, self.o2)
         inner_product = tf.reduce_sum(inner_product, axis=1)
         losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
-        loss = tf.reduce_mean(losses)
+        loss = tf.reduce_mean(losses, name='siamese_loss')
         # tf.nn.softmax_cross_entropy_with_logits()
         return loss
+
+    def loss_classify(self, features, labels):
+        losses = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=features)
+        loss = tf.reduce_mean(losses, name='classify_loss')
+        return loss
+
+    def classify_predict(self, features):
+        # It defaults to return a tensor of type tf.int64
+        return tf.argmax(input=features, axis=1)
 
     def pair_distance(self):
         # length = tf.pow(self.o1, 2)+tf.pow(self.o2, 2)

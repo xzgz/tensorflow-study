@@ -134,7 +134,7 @@ def train_siamese_resnet50():
 
         if iterations % 500 == 0:
             # saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
-            saver.save(sess=sess, save_path=model_save_path)
+            saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
 
             print('Start test...')
             correct_count = 0
