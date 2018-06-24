@@ -25,12 +25,12 @@ from siamese_tf_mnist import siamese_resnet_model
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-# model_save_dir = 'model/mnist'
-model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
+model_save_dir = 'model/mnist'
+# model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
 
 # model_name = 'model.ckpt-resnet-ce'
 # model_name = 'model.ckpt-resnet'
-model_name = 'model.ckpt-resnet50'
+model_name = 'model.ckpt-resnet32-siamese'
 model_save_path = os.path.join(model_save_dir, model_name)
 
 # snapshot = 'model.ckpt-resnet-92000'

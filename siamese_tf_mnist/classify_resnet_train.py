@@ -107,7 +107,7 @@ def train_classify_resnet():
                 gs_v, iterations, lr_v, loss_v))
 
         if iterations % 2000 == 0:
-            saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
+            # saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
 
             print('Start test...')
             predict_labels = siamese.predicted_labels.eval({siamese.classify_images: test_images})

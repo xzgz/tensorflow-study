@@ -54,12 +54,14 @@ def train_siamese_resnet50():
     if model_snapshot_path is None:
         tf.global_variables_initializer().run()
     else:
+        print('*******************************************')
         print('Restore parameters from model {}'.format(model_snapshot_path))
+        print('*******************************************')
         saver.restore(sess, save_path=model_snapshot_path)
     global_step = tf.Variable(start_iterations, name='global_step', trainable=False)
-    tf.global_variables_initializer().run()
-    # init_global_step = tf.variables_initializer([global_step])
-    # init_global_step.run()
+    # tf.global_variables_initializer().run()
+    init_global_step = tf.variables_initializer([global_step])
+    init_global_step.run()
     # global_step = tf.get_variable(name='global_step', shape=None, trainable=False, validate_shape=False)
     lr = tf.train.piecewise_constant(global_step, boundaries, learning_rates)
     train_step = tf.train.GradientDescentOptimizer(lr).minimize(siamese.loss, global_step=global_step)
@@ -132,8 +134,7 @@ def train_siamese_resnet50():
                 gs_v, iterations, lr_v, loss_v))
 
         if iterations % 500 == 0:
-            # saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
-            # saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
+            saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
 
             print('Start test...')
             correct_count = 0
