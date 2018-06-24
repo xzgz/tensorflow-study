@@ -83,7 +83,8 @@ def train_classify_resnet():
     print('The initial loss:', initial_loss)
     print('Global step:', sess.run(global_step))
     print('Initial learning rate:', sess.run(lr))
-    print('Initial accuracy: {:.4f}'.format(correct_count))
+    # print('Initial accuracy: {:.4f}'.format(correct_count))
+    print(correct_count)
 
 
     print('Start train...')
@@ -110,7 +111,8 @@ def train_classify_resnet():
             print('Start test...')
             predict_labels = siamese.predicted_labels.eval({siamese.classify_images: test_images})
             correct_count = (predict_labels == test_labels).astype('int32')
-            print('Test accuracy: {:.4f}'.format(correct_count))
+            # print('Test accuracy: {:.4f}'.format(correct_count))
+            print(correct_count)
 train_classify_resnet()
 
 
