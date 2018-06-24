@@ -78,10 +78,10 @@ def train_siamese_resnet():
         print('*******************************************')
         saver.restore(sess, save_path=model_snapshot_path)
 
+    batch_size = 128
     # batch_x1, batch_y1 = mnist.train.next_batch(128)
     # batch_x2, batch_y2 = mnist.train.next_batch(128)
     # batch_y = (batch_y1 == batch_y2).astype('float')
-    batch_size = 128
     batch_x1, batch_x2, batch_y = siamese_resnet_model.generate_train_samples(mnist, batch_size, positive_rate=0.5)
     inner_product, initial_loss = sess.run([siamese.inner_product, siamese.loss], feed_dict={
         siamese.x1: batch_x1,
