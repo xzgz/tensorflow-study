@@ -21,7 +21,7 @@ import cv2
 root = '/home/weiying1/hyg/tensorflow-study'
 sys.path.insert(0, root)
 os.chdir(root)
-
+#11111
 from siamese_tf_mnist import siamese_resnet_model
 
 
