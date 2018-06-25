@@ -1,3 +1,3 @@
 #!/bin/bash
 
-git pull origin tf140
+git pull origin master
