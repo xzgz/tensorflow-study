@@ -19,25 +19,26 @@ class Siamese:
         self.classify_labels = tf.placeholder(tf.int32, [None])
         self.is_training = is_training
 
-        self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
-        self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
+        # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
+        # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.network(self.x1)
         #     scope.reuse_variables()
         #     self.o2 = self.network(self.x2)
-        print('self.o1 shape:', self.o1.shape)
-        self.inner_product1 = tf.multiply(self.o1, self.o2)
-        self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
-        print('self.inner_product1 shape:', self.inner_product1.shape)
-        self.loss = self.loss_cross_entropy(self.inner_product)
-        self.single_sample_identity = tf.argmax(-self.inner_product, 0)
+        # print('self.o1 shape:', self.o1.shape)
+        # self.inner_product1 = tf.multiply(self.o1, self.o2)
+        # self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
+        # print('self.inner_product1 shape:', self.inner_product1.shape)
+        # self.loss = self.loss_cross_entropy(self.inner_product)
+        # self.single_sample_identity = tf.argmax(-self.inner_product, 0)
         # self.loss = self.loss_with_spring()
         # self.distance = self.pair_distance()
         # self.single_sample_identity = tf.argmax(-self.distance, 0)
 
         # self.classify_features = self.cnn_classify_model(self.classify_images, self.is_training, scope_reuse=False)
-        # self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
-        # self.predicted_labels = self.classify_predict(self.classify_features)
+        self.classify_features = self.cnn_model2(self.classify_images, self.is_training)
+        self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
+        self.predicted_labels = self.classify_predict(self.classify_features)
 
     def model_variable_scope(self):
         return tf.variable_scope("siamese")
@@ -79,6 +80,69 @@ class Siamese:
         features = resnet50_mnist(inputs, is_training, scope_reuse)
         # params = tf.trainable_variables()
         # print(params)
+        return features
+
+    def cnn_model2(self, input_images, is_training):
+        # Input Layer
+        # Reshape X to 4-D tensor: [batch_size, width, height, channels]
+        # MNIST images are 28x28 pixels, and have one color channel
+        input_layer = tf.reshape(input_images, [-1, 28, 28, 1])
+
+        # Convolutional Layer #1
+        # Computes 32 features using a 5x5 filter with ReLU activation.
+        # Padding is added to preserve width and height.
+        # Input Tensor Shape: [batch_size, 28, 28, 1]
+        # Output Tensor Shape: [batch_size, 28, 28, 32]
+        conv1 = tf.layers.conv2d(
+            inputs=input_layer,
+            filters=32,
+            kernel_size=[5, 5],
+            padding="same",
+            activation=tf.nn.relu,
+            name='conv1')
+        print(conv1.name)
+
+        # Pooling Layer #1
+        # First max pooling layer with a 2x2 filter and stride of 2
+        # Input Tensor Shape: [batch_size, 28, 28, 32]
+        # Output Tensor Shape: [batch_size, 14, 14, 32]
+        pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2, name='pool1')
+
+        # Convolutional Layer #2
+        # Computes 64 features using a 5x5 filter.
+        # Padding is added to preserve width and height.
+        # Input Tensor Shape: [batch_size, 14, 14, 32]
+        # Output Tensor Shape: [batch_size, 14, 14, 64]
+        conv2 = tf.layers.conv2d(
+            inputs=pool1,
+            filters=64,
+            kernel_size=[5, 5],
+            padding="same",
+            activation=tf.nn.relu,
+            name='conv2')
+
+        # Pooling Layer #2
+        # Second max pooling layer with a 2x2 filter and stride of 2
+        # Input Tensor Shape: [batch_size, 14, 14, 64]
+        # Output Tensor Shape: [batch_size, 7, 7, 64]
+        pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2, name='pool2')
+
+        # Flatten tensor into a batch of vectors
+        # Input Tensor Shape: [batch_size, 7, 7, 64]
+        # Output Tensor Shape: [batch_size, 7 * 7 * 64]
+        pool2_flat = tf.reshape(pool2, [-1, 7 * 7 * 64])
+
+        # Dense Layer
+        # Densely connected layer with 1024 neurons
+        # Input Tensor Shape: [batch_size, 7 * 7 * 64]
+        # Output Tensor Shape: [batch_size, 1024]
+        dense1 = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu, name='fc1')
+
+        # Add dropout operation; 0.6 probability that element will be kept
+        dropout = tf.layers.dropout(
+            inputs=dense1, rate=0.4, training=is_training, name='dropout1')
+        features = tf.layers.dense(inputs=dropout, units=10, name='fc2')
+
         return features
 
     def cnn_classify_model(self, input_images, is_training, scope_reuse):
