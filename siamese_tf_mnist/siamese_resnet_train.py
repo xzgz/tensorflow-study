@@ -31,7 +31,8 @@ model_save_dir = 'model/mnist'
 
 # model_name = 'model.ckpt-resnet-ce'
 # model_name = 'model.ckpt-resnet'
-model_name = 'model.ckpt-resnet32-siamese-ce'
+# model_name = 'model.ckpt-resnet32-siamese-ce'
+model_name = 'model.ckpt-cnn-siamese-ce'
 model_save_path = os.path.join(model_save_dir, model_name)
 
 # snapshot = 'model.ckpt-resnet-92000'
@@ -41,7 +42,7 @@ snapshot = 'variables'
 model_snapshot_path = None
 
 # learning_rates = [0.01, 0.001, 0.0001]
-learning_rates = [0.001, 0.001, 0.001]
+learning_rates = [0.1, 0.01, 0.001]
 # start_iterations = 92000
 start_iterations = 0
 max_iterations = 80000

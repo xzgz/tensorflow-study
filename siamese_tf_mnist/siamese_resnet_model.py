@@ -19,19 +19,28 @@ class Siamese:
         self.classify_labels = tf.placeholder(tf.int32, [None])
         self.is_training = is_training
 
-        self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
-        self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
-        # with self.model_variable_scope() as scope:
-        #     self.o1 = self.cnn_model2(self.x1, self.is_training)
-        #     scope.reuse_variables()
-        #     self.o2 = self.cnn_model2(self.x2, self.is_training)
-        print('self.o1 shape:', self.o1.shape)
+        # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
+        # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
+        with self.model_variable_scope() as scope:
+            self.o1 = self.cnn_model2(self.x1, self.is_training)
+            scope.reuse_variables()
+            self.o2 = self.cnn_model2(self.x2, self.is_training)
+
         self.inner_product1 = tf.multiply(self.o1, self.o2)
-        self.inner_product1 = tf.divide(1, self.inner_product1)
         self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
-        print('self.inner_product1 shape:', self.inner_product1.shape)
         self.loss = self.loss_cross_entropy(self.inner_product)
-        self.single_sample_identity = tf.argmax(-self.inner_product, 0)
+        self.single_sample_identity = tf.argmax(self.inner_product, 0)
+
+        # Not work...
+        # self.inner_product1 = tf.multiply(self.o1, self.o2)
+        # self.inner_product1 = tf.divide(1, self.inner_product1)
+        # self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
+        # self.loss = self.loss_cross_entropy(self.inner_product)
+        # self.single_sample_identity = tf.argmax(-self.inner_product, 0)
+
+        print('self.o1 shape:', self.o1.shape)
+        print('self.inner_product1 shape:', self.inner_product1.shape)
+
         # self.loss = self.loss_with_spring()
         # self.distance = self.pair_distance()
         # self.single_sample_identity = tf.argmax(-self.distance, 0)
