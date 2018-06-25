@@ -551,7 +551,7 @@ class Model(object):
         # inputs = tf.layers.dense(inputs=inputs, units=1024)
         # inputs = tf.layers.dense(inputs=inputs, units=self.num_classes)
         # print('num_classes:', self.num_classes)
-        # inputs = tf.identity(inputs, 'final_dense')
+        inputs = tf.identity(inputs, 'final_dense')
         return inputs
 
 
