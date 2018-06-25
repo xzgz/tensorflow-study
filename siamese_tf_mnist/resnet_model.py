@@ -546,9 +546,9 @@ class Model(object):
         inputs = tf.identity(inputs, 'final_reduce_mean')
 
         inputs = tf.reshape(inputs, [-1, self.final_size])
-        dropout = tf.layers.dropout(
-            inputs=inputs, rate=0.4, training=training)
-        inputs = tf.layers.dense(inputs=dropout, units=10)
+        # dropout = tf.layers.dropout(
+        #     inputs=inputs, rate=0.4, training=training)
+        # inputs = tf.layers.dense(inputs=dropout, units=10)
         # inputs = tf.layers.dense(inputs=inputs, units=1024)
         # inputs = tf.layers.dense(inputs=inputs, units=self.num_classes)
         # print('num_classes:', self.num_classes)
