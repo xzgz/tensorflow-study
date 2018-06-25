@@ -145,13 +145,13 @@ def train_siamese_resnet():
                     correct_count += 1
             accuracy = correct_count / (2100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
-        if iterations % 10000 == 0:
+        # if iterations % 10000 == 0:
             inner_product, inner_product1, id = sess.run(
                 [siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
                 feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
                            siamese.x2: gallery_image})
             print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[200], id)
-            print('inner_product1:\n', inner_product1)
+            # print('inner_product1:\n', inner_product1)
 train_siamese_resnet()
 
 
