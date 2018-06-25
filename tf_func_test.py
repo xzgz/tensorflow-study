@@ -240,7 +240,24 @@ def test_placeholder():
         print('y.dtype:', y.dtype)
         print('rand_array.dtype:', rand_array.dtype)
         print(sess.run(y, feed_dict={x: rand_array}))   # Will succeed.
-test_placeholder()
+# test_placeholder()
+
+
+def test_divide():
+    t1 = tf.constant([[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]])
+    t2 = 1/t1
+    # t3 = tf.divide(1.0, t1)  # error
+    t4 = tf.div(1, t1)
+    print('t1 dtype:', t1.dtype)
+    print('t2 dtype:', t2.dtype)
+    # print('t3 dtype:', t3.dtype)
+    print('t4 dtype:', t4.dtype)
+    sess = tf.Session()
+    print('t1:\n', sess.run(t1))
+    print('t2:\n', sess.run(t2))
+    # print('t3:\n', sess.run(t3))
+    print('t4:\n', sess.run(t4))
+test_divide()
 
 
 
