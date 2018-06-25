@@ -81,6 +81,7 @@ def train_siamese_resnet():
         saver.restore(sess, save_path=model_snapshot_path)
 
     batch_size = 128
+    tid = 300
     # batch_x1, batch_y1 = mnist.train.next_batch(128)
     # batch_x2, batch_y2 = mnist.train.next_batch(128)
     # batch_y = (batch_y1 == batch_y2).astype('float')
@@ -107,8 +108,9 @@ def train_siamese_resnet():
         [siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
         feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[260]),
                    siamese.x2: gallery_image})
-    print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[260], pre_id)
-    print('inner_product1:\n', inner_product1)
+    print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[tid], pre_id)
+    print('True label: {}, predicted label: {}'.format(test_labels[tid], pre_id))
+    # print('inner_product1:\n', inner_product1)
 
 
     print('Start train...')
@@ -150,7 +152,8 @@ def train_siamese_resnet():
                 [siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
                 feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[260]),
                            siamese.x2: gallery_image})
-            print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[260], pre_id)
+            print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[tid], pre_id)
+            print('True label: {}, predicted label: {}'.format(test_labels[tid], pre_id))
             # print('inner_product1:\n', inner_product1)
 train_siamese_resnet()
 
