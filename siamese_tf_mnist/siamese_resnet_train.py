@@ -105,9 +105,9 @@ def train_siamese_resnet():
     print('Initial accuracy: {:.4f}'.format(accuracy))
     inner_product, inner_product1, pre_id = sess.run(
         [siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
-        feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
+        feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[260]),
                    siamese.x2: gallery_image})
-    print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[200], pre_id)
+    print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[260], pre_id)
     print('inner_product1:\n', inner_product1)
 
 
@@ -148,9 +148,9 @@ def train_siamese_resnet():
         # if iterations % 10000 == 0:
             inner_product, inner_product1, pre_id = sess.run(
                 [siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
-                feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
+                feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[260]),
                            siamese.x2: gallery_image})
-            print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[200], pre_id)
+            print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[260], pre_id)
             # print('inner_product1:\n', inner_product1)
 train_siamese_resnet()
 

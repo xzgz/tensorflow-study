@@ -244,19 +244,26 @@ def test_placeholder():
 
 
 def test_divide():
-    t1 = tf.constant([[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]])
-    t2 = 1/t1
-    # t3 = tf.divide(1.0, t1)  # error
-    t4 = tf.div(1, t1)
-    print('t1 dtype:', t1.dtype)
-    print('t2 dtype:', t2.dtype)
-    # print('t3 dtype:', t3.dtype)
-    print('t4 dtype:', t4.dtype)
+    # t1 = tf.constant([[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]])
+    # t2 = 1/t1
+    # # t3 = tf.divide(1.0, t1)  # error
+    # t4 = tf.div(1, t1)
+    # print('t1 dtype:', t1.dtype)
+    # print('t2 dtype:', t2.dtype)
+    # # print('t3 dtype:', t3.dtype)
+    # print('t4 dtype:', t4.dtype)
+    # sess = tf.Session()
+    # print('t1:\n', sess.run(t1))
+    # print('t2:\n', sess.run(t2))
+    # # print('t3:\n', sess.run(t3))
+    # print('t4:\n', sess.run(t4))
+
+    t = tf.constant([-22.00627136, -21.70117188, -10.46626282, -9.78709602, -9.5978241,
+                     -6.49891472, -2.78729439, -14.46313477, 0.32265404, -2.64193416])
+    print(t.dtype)
+    index = tf.argmax(t, axis=0)
     sess = tf.Session()
-    print('t1:\n', sess.run(t1))
-    print('t2:\n', sess.run(t2))
-    # print('t3:\n', sess.run(t3))
-    print('t4:\n', sess.run(t4))
+    print('index:', sess.run(index))
 test_divide()
 
 
