@@ -534,7 +534,7 @@ class Model(object):
         # building/bottleneck block, eg resnet V2.
         if self.pre_activation:
             inputs = batch_norm(inputs, training, self.data_format)
-            # inputs = tf.nn.relu(inputs)
+            inputs = tf.nn.relu(inputs)
 
         # The current top layer has shape
         # `batch_size x pool_size x pool_size x final_size`.
@@ -546,6 +546,9 @@ class Model(object):
         inputs = tf.identity(inputs, 'final_reduce_mean')
 
         inputs = tf.reshape(inputs, [-1, self.final_size])
+        dropout = tf.layers.dropout(
+            inputs=inputs, rate=0.4, training=is_training)
+        inputs = tf.layers.dense(inputs=dropout, units=10)
         # inputs = tf.layers.dense(inputs=inputs, units=1024)
         # inputs = tf.layers.dense(inputs=inputs, units=self.num_classes)
         # print('num_classes:', self.num_classes)
