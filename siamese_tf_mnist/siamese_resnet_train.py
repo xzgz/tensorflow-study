@@ -103,6 +103,9 @@ def train_siamese_resnet():
     print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
     print('inner_product:', inner_product)
+    inner_product1 = siamese.inner_product1.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
+                                                  siamese.x2: gallery_image})
+    print('inner_product1:', inner_product1, inner_product1.shape, inner_product1.dtype)
 
 
     print('Start train...')
@@ -123,7 +126,7 @@ def train_siamese_resnet():
             # print('step %d: loss %.3f' % (iterations, loss_v))
             print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.4f}'.format(
                 gs_v, iterations, lr_v, loss_v))
-            print('inner_product:', inner_product)
+            # print('inner_product:', inner_product)
 
         if iterations % 2000 == 0:
             saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
@@ -138,6 +141,9 @@ def train_siamese_resnet():
                     correct_count += 1
             accuracy = correct_count / (2100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
+            inner_product1 = siamese.inner_product1.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
+                                                          siamese.x2: gallery_image})
+            print('inner_product1:', inner_product1, inner_product1.shape, inner_product1.dtype)
 train_siamese_resnet()
 
 
