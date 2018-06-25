@@ -105,7 +105,7 @@ def train_siamese_resnet():
     print('inner_product:', inner_product)
     inner_product1 = siamese.inner_product.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
                                                   siamese.x2: gallery_image})
-    print('inner_product1:', inner_product1, inner_product1.shape, inner_product1.dtype)
+    print('inner_product1:', inner_product1, inner_product1.shape, inner_product1.dtype, test_labels[200])
 
 
     print('Start train...')
@@ -143,7 +143,7 @@ def train_siamese_resnet():
             print('Test accuracy: {:.4f}'.format(accuracy))
             inner_product1 = siamese.inner_product.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
                                                           siamese.x2: gallery_image})
-            print('inner_product1:', inner_product1, inner_product1.shape, inner_product1.dtype)
+            print('inner_product1:', inner_product1, inner_product1.shape, inner_product1.dtype, test_labels[200])
 train_siamese_resnet()
 
 
