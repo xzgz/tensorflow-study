@@ -44,8 +44,8 @@ model_snapshot_path = None
 learning_rates = [0.1, 0.01]
 # start_iterations = 92000
 start_iterations = 0
-max_iterations = 240000
-boundaries = [220000]
+max_iterations = 50000
+boundaries = [10000]
 
 
 def train_siamese_resnet():
@@ -143,6 +143,7 @@ def train_siamese_resnet():
                     correct_count += 1
             accuracy = correct_count / (2100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
+        if iterations % 10000 == 0:
             inner_product1 = siamese.inner_product1.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
                                                           siamese.x2: gallery_image})
             inner_product = siamese.inner_product.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
