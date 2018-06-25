@@ -534,7 +534,7 @@ class Model(object):
         # building/bottleneck block, eg resnet V2.
         if self.pre_activation:
             inputs = batch_norm(inputs, training, self.data_format)
-            inputs = tf.nn.relu(inputs)
+            # inputs = tf.nn.relu(inputs)
 
         # The current top layer has shape
         # `batch_size x pool_size x pool_size x final_size`.
