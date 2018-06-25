@@ -17,8 +17,8 @@ import numpy as np
 import os
 import sys
 import cv2
-# root = '/home/gysj/tensorflow-study'
-root = '/home/weiying1/hyg/tensorflow-study'
+root = '/home/gysj/tensorflow-study'
+# root = '/home/weiying1/hyg/tensorflow-study'
 sys.path.insert(0, root)
 os.chdir(root)
 
