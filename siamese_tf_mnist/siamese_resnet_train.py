@@ -103,7 +103,7 @@ def train_siamese_resnet():
     print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
     print('inner_product:', inner_product)
-    inner_product1 = siamese.inner_product1.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
+    inner_product1 = siamese.inner_product.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
                                                   siamese.x2: gallery_image})
     print('inner_product1:', inner_product1, inner_product1.shape, inner_product1.dtype)
 
@@ -141,7 +141,7 @@ def train_siamese_resnet():
                     correct_count += 1
             accuracy = correct_count / (2100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
-            inner_product1 = siamese.inner_product1.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
+            inner_product1 = siamese.inner_product.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
                                                           siamese.x2: gallery_image})
             print('inner_product1:', inner_product1, inner_product1.shape, inner_product1.dtype)
 train_siamese_resnet()
