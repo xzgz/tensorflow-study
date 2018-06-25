@@ -42,7 +42,7 @@ snapshot = 'variables'
 model_snapshot_path = None
 
 # learning_rates = [0.01, 0.001, 0.0001]
-learning_rates = [0.01, 0.01, 0.001]
+learning_rates = [0.1, 0.01, 0.001]
 # start_iterations = 92000
 start_iterations = 0
 max_iterations = 80000
@@ -110,7 +110,7 @@ def train_siamese_resnet():
                    siamese.x2: gallery_image})
     print('inner_product:', inner_product, inner_product.shape, inner_product.dtype)
     print('True label: {}, predicted label: {}'.format(test_labels[tid], pre_id))
-    # print('inner_product1:\n', inner_product1)
+    print('inner_product1:\n', inner_product1)
 
 
     print('Start train...')
