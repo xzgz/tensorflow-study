@@ -103,11 +103,11 @@ def train_siamese_resnet():
     print('Global step:', sess.run(global_step))
     print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
-    inner_product1 = siamese.inner_product1.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
-                                                  siamese.x2: gallery_image})
-    inner_product = siamese.inner_product.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
-                                                siamese.x2: gallery_image})
-    print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[200])
+    inner_product, inner_product1, id = sess.run(
+        [siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
+        feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
+                   siamese.x2: gallery_image})
+    print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[200], id)
     print('inner_product1:\n', inner_product1)
 
 
@@ -116,10 +116,11 @@ def train_siamese_resnet():
         iterations = step+1
         batch_x1, batch_x2, batch_y = siamese_resnet_model.generate_train_samples(mnist, batch_size, positive_rate=0.5)
 
-        _, loss_v, gs_v, lr_v, inner_product = sess.run([train_step, siamese.loss, global_step, lr, siamese.inner_product], feed_dict={
-            siamese.x1: batch_x1,
-            siamese.x2: batch_x2,
-            siamese.y_: batch_y})
+        _, loss_v, gs_v, lr_v, inner_product = sess.run(
+            [train_step, siamese.loss, global_step, lr, siamese.inner_product],
+            feed_dict={siamese.x1: batch_x1,
+                       siamese.x2: batch_x2,
+                       siamese.y_: batch_y})
 
         if np.isnan(loss_v):
             print('Model diverged with loss = NaN')
@@ -145,11 +146,11 @@ def train_siamese_resnet():
             accuracy = correct_count / (2100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
         if iterations % 10000 == 0:
-            inner_product1 = siamese.inner_product1.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
-                                                          siamese.x2: gallery_image})
-            inner_product = siamese.inner_product.eval({siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
-                                                        siamese.x2: gallery_image})
-            print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[200])
+            inner_product, inner_product1, id = sess.run(
+                [siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
+                feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[200]),
+                           siamese.x2: gallery_image})
+            print('inner_product:', inner_product, inner_product.shape, inner_product.dtype, test_labels[200], id)
             print('inner_product1:\n', inner_product1)
 train_siamese_resnet()
 
