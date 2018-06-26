@@ -123,10 +123,10 @@ class Siamese:
         #     scope.reuse_variables()
         #     self.o2 = self.network(self.x2)
 
-        self.inner_product1 = tf.multiply(self.o1, self.o2)
-        self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
-        self.loss = self.loss_cross_entropy(self.inner_product)
-        self.single_sample_identity = tf.argmax(self.inner_product, axis=0)
+        # self.inner_product1 = tf.multiply(self.o1, self.o2)
+        # self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
+        # self.loss = self.loss_cross_entropy(self.inner_product)
+        # self.single_sample_identity = tf.argmax(self.inner_product, axis=0)
 
         # Not work...
         # self.inner_product1 = tf.multiply(self.o1, self.o2)
@@ -136,11 +136,11 @@ class Siamese:
         # self.single_sample_identity = tf.argmax(-self.inner_product, 0)
 
         print('self.o1 shape:', self.o1.shape)
-        print('self.inner_product1 shape:', self.inner_product1.shape)
+        # print('self.inner_product1 shape:', self.inner_product1.shape)
 
-        # self.loss = self.loss_with_spring()
-        # self.distance = self.pair_distance()
-        # self.single_sample_identity = tf.argmax(-self.distance, 0)
+        self.loss = self.loss_with_spring()
+        self.distance = self.pair_distance()
+        self.single_sample_identity = tf.argmax(-self.distance, 0)
 
         # self.classify_features = self.cnn_classify_model(self.classify_images, self.is_training, scope_reuse=False)
         # self.classify_features = self.cnn_model2(self.classify_images, self.is_training)

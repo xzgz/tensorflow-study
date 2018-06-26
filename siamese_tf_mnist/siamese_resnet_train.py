@@ -86,7 +86,7 @@ def train_siamese_resnet():
     # batch_x2, batch_y2 = mnist.train.next_batch(128)
     # batch_y = (batch_y1 == batch_y2).astype('float')
     batch_x1, batch_x2, batch_y = siamese_resnet_model.generate_train_samples(mnist, batch_size, positive_rate=0.5)
-    inner_product, initial_loss = sess.run([siamese.inner_product, siamese.loss], feed_dict={
+    inner_product, initial_loss = sess.run([siamese.distance, siamese.loss], feed_dict={
         siamese.x1: batch_x1,
         siamese.x2: batch_x2,
         siamese.y_: batch_y})
@@ -105,7 +105,7 @@ def train_siamese_resnet():
     print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
     inner_product, inner_product1, pre_id = sess.run(
-        [siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
+        [siamese.distance, siamese.distance, siamese.single_sample_identity],
         feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[tid]),
                    siamese.x2: gallery_image})
     print('inner_product:', inner_product, inner_product.shape, inner_product.dtype)
@@ -119,7 +119,7 @@ def train_siamese_resnet():
         batch_x1, batch_x2, batch_y = siamese_resnet_model.generate_train_samples(mnist, batch_size, positive_rate=0.5)
 
         _, loss_v, gs_v, lr_v, inner_product = sess.run(
-            [train_step, siamese.loss, global_step, lr, siamese.inner_product],
+            [train_step, siamese.loss, global_step, lr, siamese.distance],
             feed_dict={siamese.x1: batch_x1,
                        siamese.x2: batch_x2,
                        siamese.y_: batch_y})
@@ -149,7 +149,7 @@ def train_siamese_resnet():
             print('Test accuracy: {:.4f}'.format(accuracy))
         # if iterations % 10000 == 0:
             output1, output2, inner_product, inner_product1, pre_id = sess.run(
-                [siamese.o1, siamese.o2, siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
+                [siamese.o1, siamese.o2, siamese.distance, siamese.distance, siamese.single_sample_identity],
                 feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[tid]),
                            siamese.x2: gallery_image})
             print('inner_product:', inner_product, inner_product.shape, inner_product.dtype)
