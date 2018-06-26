@@ -92,7 +92,7 @@ def sigmoid_cross_entropy_with_logits(  # pylint: disable=invalid-name
         #     relu_logits - logits * labels,
         #     math_ops.log1p(math_ops.exp(neg_abs_logits)),
         #     name=name)
-        return math_ops.add(-math_ops.log(2.0) + (labels-1)*math_ops.log(math_ops.exp(-logits) - 1),
+        return math_ops.add(-math_ops.log(2) + (labels-1)*math_ops.log(math_ops.exp(-logits) - 1),
                      math_ops.log1p(math_ops.exp(-logits)), name=name)
 
 
@@ -130,7 +130,7 @@ class Siamese:
         print('********************************')
         self.distance1 = tf.multiply(self.o1, self.o2)
         self.distance = tf.reduce_sum(self.distance1, axis=1)
-        self.loss = self.loss_cross_entropy(self.distance)
+        self.loss = self.loss_cross_entropy(-self.distance)
         self.single_sample_identity = tf.argmax(self.distance, axis=0)
 
         # Not work...
@@ -338,7 +338,7 @@ class Siamese:
         # Add dropout operation; 0.6 probability that element will be kept
         # dropout = tf.layers.dropout(
         #     inputs=dense1, rate=0.4, training=is_training, name='dropout1')
-        features = tf.layers.dense(inputs=dense1, units=32, name='fc2')
+        features = tf.layers.dense(inputs=dense1, units=32, activation=tf.nn.relu, name='fc2')
 
         # siamese(cross entropy loss):
         # units=2:  Test accuracy: 0.3110
@@ -479,8 +479,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                labels.append(batch_y[i])
-                # labels.append(False)
+                # labels.append(batch_y[i])
+                labels.append(False)
             pos_num += 1
             if pos_num == pos_cnt:
                 break
@@ -492,8 +492,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if not v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                labels.append(batch_y[i])
-                # labels.append(True)
+                # labels.append(batch_y[i])
+                labels.append(True)
             neg_num += 1
             if neg_num == neg_cnt:
                 break
