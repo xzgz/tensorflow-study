@@ -7,6 +7,9 @@ import tensorflow as tf
 from siamese_tf_mnist import resnet_model
 import numpy as np
 
+_BATCH_NORM_DECAY = 0.997
+_BATCH_NORM_EPSILON = 1e-5
+
 
 class Siamese:
 
@@ -19,12 +22,12 @@ class Siamese:
         self.classify_labels = tf.placeholder(tf.int32, [None])
         self.is_training = is_training
 
-        self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
-        self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
-        # with self.model_variable_scope() as scope:
-        #     self.o1 = self.cnn_model2(self.x1, self.is_training)
-        #     scope.reuse_variables()
-        #     self.o2 = self.cnn_model2(self.x2, self.is_training)
+        # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
+        # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
+        with self.model_variable_scope() as scope:
+            self.o1 = self.cnn_model2(self.x1, self.is_training, data_format='channels_first')
+            scope.reuse_variables()
+            self.o2 = self.cnn_model2(self.x2, self.is_training, data_format='channels_first')
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.network(self.x1)
         #     scope.reuse_variables()
@@ -96,11 +99,11 @@ class Siamese:
         # print(params)
         return features
 
-    def cnn_model2(self, input_images, is_training):
+    def cnn_model2(self, input_images, is_training, data_format):
         # Input Layer
         # Reshape X to 4-D tensor: [batch_size, width, height, channels]
         # MNIST images are 28x28 pixels, and have one color channel
-        input_layer = tf.reshape(input_images, [-1, 28, 28, 1])
+        input_layer = tf.reshape(input_images, [-1, 1, 28, 28])
 
         # Convolutional Layer #1
         # Computes 32 features using a 5x5 filter with ReLU activation.
@@ -112,9 +115,10 @@ class Siamese:
             filters=32,
             kernel_size=[5, 5],
             padding="same",
-            activation=tf.nn.relu,
+            data_format=data_format,
             name='conv1')
-        print(conv1.name)
+        conv1 = self.batch_norm(conv1, is_training, data_format)
+        conv1 = tf.nn.relu(conv1)
 
         # Pooling Layer #1
         # First max pooling layer with a 2x2 filter and stride of 2
@@ -132,8 +136,10 @@ class Siamese:
             filters=64,
             kernel_size=[5, 5],
             padding="same",
-            activation=tf.nn.relu,
+            data_format=data_format,
             name='conv2')
+        conv2 = self.batch_norm(conv2, is_training, data_format)
+        conv2 = tf.nn.relu(conv2)
 
         # Pooling Layer #2
         # Second max pooling layer with a 2x2 filter and stride of 2
@@ -196,6 +202,15 @@ class Siamese:
         b = tf.get_variable(name+'b', dtype=tf.float32, initializer=tf.constant(0.01, shape=[n_weight], dtype=tf.float32))
         fc = tf.nn.bias_add(tf.matmul(bottom, W), b)
         return fc
+
+    def batch_norm(self, inputs, training, data_format):
+        """Performs a batch normalization using a standard set of parameters."""
+        # We set fused=True for a significant performance boost. See
+        # https://www.tensorflow.org/performance/performance_guide#common_fused_ops
+        return tf.layers.batch_normalization(
+            inputs=inputs, axis=1 if data_format == 'channels_first' else 3,
+            momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON, center=True,
+            scale=True, training=training, fused=True)
 
     def loss_with_spring(self):
         margin = 5.0
@@ -277,7 +292,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                labels.append(False)
+                labels.append(batch_y)
+                # labels.append(False)
             pos_num += 1
             if pos_num == pos_cnt:
                 break
@@ -289,7 +305,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if not v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                labels.append(True)
+                labels.append(batch_y)
+                # labels.append(True)
             neg_num += 1
             if neg_num == neg_cnt:
                 break
