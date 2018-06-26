@@ -24,14 +24,17 @@ class Siamese:
 
         # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
         # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
-        # with self.model_variable_scope() as scope:
-        #     self.o1 = self.cnn_model2(self.x1, self.is_training)
-        #     scope.reuse_variables()
-        #     self.o2 = self.cnn_model2(self.x2, self.is_training)
+
         with self.model_variable_scope() as scope:
-            self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
+            self.o1 = self.cnn_model2(self.x1, self.is_training)
             scope.reuse_variables()
-            self.o2 = self.cnn_model3(self.x2, self.is_training, data_format='channels_first')
+            self.o2 = self.cnn_model2(self.x2, self.is_training)
+
+        # with self.model_variable_scope() as scope:
+        #     self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
+        #     scope.reuse_variables()
+        #     self.o2 = self.cnn_model3(self.x2, self.is_training, data_format='channels_first')
+
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.network(self.x1)
         #     scope.reuse_variables()
