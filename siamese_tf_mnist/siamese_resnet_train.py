@@ -154,8 +154,9 @@ def train_siamese_resnet():
                            siamese.x2: gallery_image})
             print('inner_product:', inner_product, inner_product.shape, inner_product.dtype)
             print('True label: {}, predicted label: {}'.format(test_labels[tid], pre_id))
-            print('output1:', output1)
-            print('output2:', output2)
+            for i, v in enumerate(output1):
+                print('output1_'+str(i)+':', output1[i])
+                print('output2_'+str(i)+':', output2[i])
             # print('inner_product1:\n', inner_product1)
         if iterations == max_iterations:
             print('Start test all...')
