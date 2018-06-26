@@ -92,7 +92,7 @@ def sigmoid_cross_entropy_with_logits(  # pylint: disable=invalid-name
         #     relu_logits - logits * labels,
         #     math_ops.log1p(math_ops.exp(neg_abs_logits)),
         #     name=name)
-        return math_ops.add(-math_ops.log(2) + (labels-1)*math_ops.log(math_ops.exp(-logits) - 1),
+        return math_ops.add(-math_ops.log(2.0) + (labels-1)*math_ops.log(math_ops.exp(-logits) - 1),
                      math_ops.log1p(math_ops.exp(-logits)), name=name)
 
 
