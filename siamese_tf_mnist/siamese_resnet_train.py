@@ -42,7 +42,7 @@ snapshot = 'variables'
 model_snapshot_path = None
 
 # learning_rates = [0.01, 0.001, 0.0001]
-learning_rates = [0.01, 0.01, 0.001]
+learning_rates = [0.001, 0.001, 0.001]
 # start_iterations = 92000
 start_iterations = 0
 max_iterations = 80000
