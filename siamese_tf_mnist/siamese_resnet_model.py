@@ -124,7 +124,7 @@ class Siamese:
         # First max pooling layer with a 2x2 filter and stride of 2
         # Input Tensor Shape: [batch_size, 28, 28, 32]
         # Output Tensor Shape: [batch_size, 14, 14, 32]
-        pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2, name='pool1')
+        pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2, data_format=data_format, name='pool1')
 
         # Convolutional Layer #2
         # Computes 64 features using a 5x5 filter.
@@ -145,7 +145,7 @@ class Siamese:
         # Second max pooling layer with a 2x2 filter and stride of 2
         # Input Tensor Shape: [batch_size, 14, 14, 64]
         # Output Tensor Shape: [batch_size, 7, 7, 64]
-        pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2, name='pool2')
+        pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2, data_format=data_format, name='pool2')
 
         # Flatten tensor into a batch of vectors
         # Input Tensor Shape: [batch_size, 7, 7, 64]
