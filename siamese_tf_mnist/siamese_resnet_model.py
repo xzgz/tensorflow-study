@@ -241,7 +241,7 @@ class Siamese:
         # Add dropout operation; 0.6 probability that element will be kept
         dropout = tf.layers.dropout(
             inputs=dense1, rate=0.4, training=is_training, name='dropout1')
-        features = tf.layers.dense(inputs=dropout, units=2, name='fc2')
+        features = tf.layers.dense(inputs=dropout, units=64, name='fc2')
 
         # units=10: Test accuracy: 0.9750
         # units=32: Test accuracy: 0.9765
