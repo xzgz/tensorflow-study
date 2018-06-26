@@ -127,7 +127,11 @@ class Siamese:
             padding="same",
             data_format=data_format,
             name='conv1')
-        conv1 = batch_norm(conv1, is_training, data_format)
+        # conv1 = batch_norm(conv1, is_training, data_format)
+        conv1 = tf.layers.batch_normalization(
+            inputs=conv1, axis=1 if data_format == 'channels_first' else 3,
+            momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON, center=True,
+            scale=True, training=is_training, fused=True, name='bn1')
         conv1 = tf.nn.relu(conv1)
 
         # Pooling Layer #1
@@ -148,7 +152,11 @@ class Siamese:
             padding="same",
             data_format=data_format,
             name='conv2')
-        conv2 = batch_norm(conv2, is_training, data_format)
+        # conv2 = batch_norm(conv2, is_training, data_format)
+        conv2 = tf.layers.batch_normalization(
+            inputs=conv2, axis=1 if data_format == 'channels_first' else 3,
+            momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON, center=True,
+            scale=True, training=is_training, fused=True, name='bn2')
         conv2 = tf.nn.relu(conv2)
 
         # Pooling Layer #2
