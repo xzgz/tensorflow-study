@@ -130,7 +130,7 @@ class Siamese:
         print('********************************')
         self.distance1 = tf.multiply(self.o1, self.o2)
         self.distance = tf.reduce_sum(self.distance1, axis=1)
-        self.loss = self.loss_cross_entropy(-self.distance-100.0)
+        self.loss = self.loss_cross_entropy(-self.distance/10)
         self.single_sample_identity = tf.argmax(self.distance, axis=0)
 
         # Not work...
@@ -349,6 +349,7 @@ class Siamese:
         # units=32: Test accuracy: 0.9765
         # units=64: Test accuracy: 0.9785
         # units=32: Test accuracy: 0.9835(without dropout)
+        # units=32: Test accuracy: 0.9845(without dropout, with modified sigmoid cross entropy)
         # siamese(spring loss):
         # units=32: Test accuracy: 0.9880(without dropout)
         return features
