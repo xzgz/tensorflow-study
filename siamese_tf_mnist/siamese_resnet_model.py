@@ -35,7 +35,7 @@ class Siamese:
 
         self.inner_product1 = tf.multiply(self.o1, self.o2)
         self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
-        self.loss = self.loss_cross_entropy(-self.inner_product)
+        self.loss = self.loss_cross_entropy(self.inner_product)
         self.single_sample_identity = tf.argmax(self.inner_product, 0)
 
         # Not work...
