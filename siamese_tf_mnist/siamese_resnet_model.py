@@ -36,7 +36,7 @@ class Siamese:
         self.inner_product1 = tf.multiply(self.o1, self.o2)
         self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
         self.loss = self.loss_cross_entropy(self.inner_product)
-        self.single_sample_identity = tf.argmax(self.inner_product, 0)
+        self.single_sample_identity = tf.argmax(self.inner_product, axis=0)
 
         # Not work...
         # self.inner_product1 = tf.multiply(self.o1, self.o2)
@@ -161,7 +161,7 @@ class Siamese:
         # Add dropout operation; 0.6 probability that element will be kept
         dropout = tf.layers.dropout(
             inputs=dense1, rate=0.4, training=is_training, name='dropout1')
-        features = tf.layers.dense(inputs=dropout, units=32, activation=tf.nn.relu, name='fc2')
+        features = tf.layers.dense(inputs=dropout, units=32, name='fc2')
 
         return features
 
