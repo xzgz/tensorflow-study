@@ -11,7 +11,7 @@ _BATCH_NORM_DECAY = 0.997
 _BATCH_NORM_EPSILON = 1e-5
 
 
-def batch_norm(self, inputs, training, data_format):
+def batch_norm(inputs, training, data_format):
     """Performs a batch normalization using a standard set of parameters."""
     # We set fused=True for a significant performance boost. See
     # https://www.tensorflow.org/performance/performance_guide#common_fused_ops
