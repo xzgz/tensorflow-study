@@ -169,6 +169,7 @@ class Siamese:
         # units=4:  Test accuracy: 0.4340
         # units=10: Test accuracy: 0.8985
         # units=32: Test accuracy: 0.8850
+        # units=32: Test accuracy: 0.9600(without dropout)
         features = tf.layers.dense(inputs=dense1, units=32, name='fc2')
         # all_variable = tf.global_variables()
         # print(all_variable)
