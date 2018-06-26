@@ -42,11 +42,11 @@ snapshot = 'variables'
 model_snapshot_path = None
 
 # learning_rates = [0.01, 0.001, 0.0001]
-learning_rates = [10.0, 10.0, 1.0]
+learning_rates = [10.0, 1.0, 0.1]
 # start_iterations = 92000
 start_iterations = 0
-max_iterations = 80000
-boundaries = [10000, 50000]
+max_iterations = 120000
+boundaries = [40000, 80000]
 
 
 def train_siamese_resnet():
