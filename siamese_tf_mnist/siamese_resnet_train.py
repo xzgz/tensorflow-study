@@ -81,7 +81,7 @@ def train_siamese_resnet():
         saver.restore(sess, save_path=model_snapshot_path)
 
     batch_size = 128
-    tid = 300
+    tid = 360
     # batch_x1, batch_y1 = mnist.train.next_batch(128)
     # batch_x2, batch_y2 = mnist.train.next_batch(128)
     # batch_y = (batch_y1 == batch_y2).astype('float')
@@ -106,7 +106,7 @@ def train_siamese_resnet():
     print('Initial accuracy: {:.4f}'.format(accuracy))
     inner_product, inner_product1, pre_id = sess.run(
         [siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
-        feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[260]),
+        feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[tid]),
                    siamese.x2: gallery_image})
     print('inner_product:', inner_product, inner_product.shape, inner_product.dtype)
     print('True label: {}, predicted label: {}'.format(test_labels[tid], pre_id))
@@ -150,7 +150,7 @@ def train_siamese_resnet():
         # if iterations % 10000 == 0:
             output1, output2, inner_product, inner_product1, pre_id = sess.run(
                 [siamese.o1, siamese.o2, siamese.inner_product, siamese.inner_product1, siamese.single_sample_identity],
-                feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[260]),
+                feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[tid]),
                            siamese.x2: gallery_image})
             print('inner_product:', inner_product, inner_product.shape, inner_product.dtype)
             print('True label: {}, predicted label: {}'.format(test_labels[tid], pre_id))

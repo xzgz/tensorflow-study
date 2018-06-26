@@ -4,11 +4,94 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
+from tensorflow.python.ops import array_ops
+from tensorflow.python.ops import math_ops
+from tensorflow.python.framework import ops
+from tensorflow.python.ops import nn_ops
 from siamese_tf_mnist import resnet_model
 import numpy as np
 
 _BATCH_NORM_DECAY = 0.997
 _BATCH_NORM_EPSILON = 1e-5
+
+
+def sigmoid_cross_entropy_with_logits(  # pylint: disable=invalid-name
+        _sentinel=None,
+        labels=None,
+        logits=None,
+        name=None):
+    """Computes sigmoid cross entropy given `logits`.
+
+    Measures the probability error in discrete classification tasks in which each
+    class is independent and not mutually exclusive.  For instance, one could
+    perform multilabel classification where a picture can contain both an elephant
+    and a dog at the same time.
+
+    For brevity, let `x = logits`, `z = labels`.  The logistic loss is
+
+          z * -log(sigmoid(x)) + (1 - z) * -log(1 - sigmoid(x))
+        = z * -log(1 / (1 + exp(-x))) + (1 - z) * -log(exp(-x) / (1 + exp(-x)))
+        = z * log(1 + exp(-x)) + (1 - z) * (-log(exp(-x)) + log(1 + exp(-x)))
+        = z * log(1 + exp(-x)) + (1 - z) * (x + log(1 + exp(-x))
+        = (1 - z) * x + log(1 + exp(-x))
+        = x - x * z + log(1 + exp(-x))
+
+    For x < 0, to avoid overflow in exp(-x), we reformulate the above
+
+          x - x * z + log(1 + exp(-x))
+        = log(exp(x)) - x * z + log(1 + exp(-x))
+        = - x * z + log(1 + exp(x))
+
+    Hence, to ensure stability and avoid overflow, the implementation uses this
+    equivalent formulation
+
+        max(x, 0) - x * z + log(1 + exp(-abs(x)))
+
+    `logits` and `labels` must have the same type and shape.
+
+    Args:
+      _sentinel: Used to prevent positional parameters. Internal, do not use.
+      labels: A `Tensor` of the same type and shape as `logits`.
+      logits: A `Tensor` of type `float32` or `float64`.
+      name: A name for the operation (optional).
+
+    Returns:
+      A `Tensor` of the same shape as `logits` with the componentwise
+      logistic losses.
+
+    Raises:
+      ValueError: If `logits` and `labels` do not have the same shape.
+    """
+    # pylint: disable=protected-access
+    nn_ops._ensure_xent_args("sigmoid_cross_entropy_with_logits", _sentinel,
+                             labels, logits)
+    # pylint: enable=protected-access
+
+    with ops.name_scope(name, "logistic_loss", [logits, labels]) as name:
+        logits = ops.convert_to_tensor(logits, name="logits")
+        labels = ops.convert_to_tensor(labels, name="labels")
+        try:
+            labels.get_shape().merge_with(logits.get_shape())
+        except ValueError:
+            raise ValueError("logits and labels must have the same shape (%s vs %s)" %
+                             (logits.get_shape(), labels.get_shape()))
+
+        # The logistic loss formula from above is
+        #   x - x * z + log(1 + exp(-x))
+        # For x < 0, a more numerically stable formula is
+        #   -x * z + log(1 + exp(x))
+        # Note that these two expressions can be combined into the following:
+        #   max(x, 0) - x * z + log(1 + exp(-abs(x)))
+        # To allow computing gradients at zero, we define custom versions of max and
+        # abs functions.
+        zeros = array_ops.zeros_like(logits, dtype=logits.dtype)
+        cond = (logits >= zeros)
+        relu_logits = array_ops.where(cond, logits, zeros)
+        neg_abs_logits = array_ops.where(cond, -logits, logits)
+        return math_ops.add(
+            relu_logits - logits * labels,
+            math_ops.log1p(math_ops.exp(neg_abs_logits)),
+            name=name)
 
 
 class Siamese:
@@ -25,15 +108,15 @@ class Siamese:
         # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
         # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
 
-        # with self.model_variable_scope() as scope:
-        #     self.o1 = self.cnn_model2(self.x1, self.is_training)
-        #     scope.reuse_variables()
-        #     self.o2 = self.cnn_model2(self.x2, self.is_training)
-
         with self.model_variable_scope() as scope:
-            self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
+            self.o1 = self.cnn_model2(self.x1, self.is_training)
             scope.reuse_variables()
-            self.o2 = self.cnn_model3(self.x2, self.is_training, data_format='channels_first')
+            self.o2 = self.cnn_model2(self.x2, self.is_training)
+
+        # with self.model_variable_scope() as scope:
+        #     self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
+        #     scope.reuse_variables()
+        #     self.o2 = self.cnn_model3(self.x2, self.is_training, data_format='channels_first')
 
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.network(self.x1)
@@ -42,7 +125,7 @@ class Siamese:
 
         self.inner_product1 = tf.multiply(self.o1, self.o2)
         self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
-        self.loss = self.loss_cross_entropy(-self.inner_product)
+        self.loss = self.loss_cross_entropy(self.inner_product)
         self.single_sample_identity = tf.argmax(self.inner_product, axis=0)
 
         # Not work...
@@ -171,7 +254,7 @@ class Siamese:
         # Add dropout operation; 0.6 probability that element will be kept
         # dropout = tf.layers.dropout(
         #     inputs=dense1, rate=0.4, training=is_training, name='dropout1')
-        features = tf.layers.dense(inputs=dense1, units=64, activation=tf.nn.sigmoid, name='fc2')
+        features = tf.layers.dense(inputs=dense1, units=32, name='fc2')
         # all_variable = tf.global_variables()
         # print(all_variable)
 
@@ -182,8 +265,9 @@ class Siamese:
         # units=32: Test accuracy: 0.8850
         # units=10: Test accuracy: 0.9295(without dropout)
         # units=32: Test accuracy: 0.9600(without dropout)
+        # units=64: Test accuracy: 0.9480(without dropout)
         # classify:
-        # Test accuracy: 0.9906
+        # Test accuracy: 0.9906(without dropout)
         return features
 
     def cnn_model2(self, input_images, is_training):
@@ -243,10 +327,11 @@ class Siamese:
         dense1 = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu, name='fc1')
 
         # Add dropout operation; 0.6 probability that element will be kept
-        dropout = tf.layers.dropout(
-            inputs=dense1, rate=0.4, training=is_training, name='dropout1')
-        features = tf.layers.dense(inputs=dropout, units=10, name='fc2')
+        # dropout = tf.layers.dropout(
+        #     inputs=dense1, rate=0.4, training=is_training, name='dropout1')
+        features = tf.layers.dense(inputs=dense1, units=32, name='fc2')
 
+        # siamese:
         # units=2:  Test accuracy: 0.3110
         # units=10: Test accuracy: 0.9750
         # units=32: Test accuracy: 0.9765
@@ -333,7 +418,8 @@ class Siamese:
         return loss
 
     def loss_cross_entropy(self, inner_product):
-        losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
+        # losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
+        losses = sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
         loss = tf.reduce_mean(losses, name='siamese_loss')
         # tf.nn.softmax_cross_entropy_with_logits()
         return loss
@@ -381,8 +467,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                # labels.append(batch_y[i])
-                labels.append(False)
+                labels.append(batch_y[i])
+                # labels.append(False)
             pos_num += 1
             if pos_num == pos_cnt:
                 break
@@ -394,8 +480,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if not v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                # labels.append(batch_y[i])
-                labels.append(True)
+                labels.append(batch_y[i])
+                # labels.append(True)
             neg_num += 1
             if neg_num == neg_cnt:
                 break
