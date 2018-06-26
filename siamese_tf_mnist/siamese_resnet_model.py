@@ -170,15 +170,16 @@ class Siamese:
         # Add dropout operation; 0.6 probability that element will be kept
         # dropout = tf.layers.dropout(
         #     inputs=dense1, rate=0.4, training=is_training, name='dropout1')
-        # units=2:  Test accuracy: 0.2780
-        # units=4:  Test accuracy: 0.4340
-        # units=10: Test accuracy: 0.8985
-        # units=32: Test accuracy: 0.8850
-        # units=32: Test accuracy: 0.9600(without dropout)
         features = tf.layers.dense(inputs=dense1, units=10, name='fc2')
         # all_variable = tf.global_variables()
         # print(all_variable)
 
+        # units=2:  Test accuracy: 0.2780
+        # units=4:  Test accuracy: 0.4340
+        # units=10: Test accuracy: 0.8985
+        # units=32: Test accuracy: 0.8850
+        # units=10: Test accuracy: 0.9295(without dropout)
+        # units=32: Test accuracy: 0.9600(without dropout)
         return features
 
     def cnn_model2(self, input_images, is_training):
@@ -240,8 +241,10 @@ class Siamese:
         # Add dropout operation; 0.6 probability that element will be kept
         dropout = tf.layers.dropout(
             inputs=dense1, rate=0.4, training=is_training, name='dropout1')
-        features = tf.layers.dense(inputs=dropout, units=10, name='fc2')
+        features = tf.layers.dense(inputs=dropout, units=2, name='fc2')
 
+        # units=10: Test accuracy: 0.9750
+        # units=32: Test accuracy: 0.9765
         return features
 
 
