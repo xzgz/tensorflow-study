@@ -11,6 +11,16 @@ _BATCH_NORM_DECAY = 0.997
 _BATCH_NORM_EPSILON = 1e-5
 
 
+def batch_norm(self, inputs, training, data_format):
+    """Performs a batch normalization using a standard set of parameters."""
+    # We set fused=True for a significant performance boost. See
+    # https://www.tensorflow.org/performance/performance_guide#common_fused_ops
+    return tf.layers.batch_normalization(
+        inputs=inputs, axis=1 if data_format == 'channels_first' else 3,
+        momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON, center=True,
+        scale=True, training=training, fused=True)
+
+
 class Siamese:
 
     # Create model
@@ -117,7 +127,7 @@ class Siamese:
             padding="same",
             data_format=data_format,
             name='conv1')
-        conv1 = self.batch_norm(conv1, is_training, data_format)
+        conv1 = batch_norm(conv1, is_training, data_format)
         conv1 = tf.nn.relu(conv1)
 
         # Pooling Layer #1
@@ -138,7 +148,7 @@ class Siamese:
             padding="same",
             data_format=data_format,
             name='conv2')
-        conv2 = self.batch_norm(conv2, is_training, data_format)
+        conv2 = batch_norm(conv2, is_training, data_format)
         conv2 = tf.nn.relu(conv2)
 
         # Pooling Layer #2
