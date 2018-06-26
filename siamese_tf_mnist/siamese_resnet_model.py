@@ -30,20 +30,20 @@ class Siamese:
         #     scope.reuse_variables()
         #     self.o2 = self.cnn_model2(self.x2, self.is_training)
 
-        # with self.model_variable_scope() as scope:
-        #     self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
-        #     scope.reuse_variables()
-        #     self.o2 = self.cnn_model3(self.x2, self.is_training, data_format='channels_first')
+        with self.model_variable_scope() as scope:
+            self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
+            scope.reuse_variables()
+            self.o2 = self.cnn_model3(self.x2, self.is_training, data_format='channels_first')
 
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.network(self.x1)
         #     scope.reuse_variables()
         #     self.o2 = self.network(self.x2)
 
-        # self.inner_product1 = tf.multiply(self.o1, self.o2)
-        # self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
-        # self.loss = self.loss_cross_entropy(self.inner_product)
-        # self.single_sample_identity = tf.argmax(self.inner_product, axis=0)
+        self.inner_product1 = tf.multiply(self.o1, self.o2)
+        self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
+        self.loss = self.loss_cross_entropy(self.inner_product)
+        self.single_sample_identity = tf.argmax(self.inner_product, axis=0)
 
         # Not work...
         # self.inner_product1 = tf.multiply(self.o1, self.o2)
@@ -52,8 +52,8 @@ class Siamese:
         # self.loss = self.loss_cross_entropy(self.inner_product)
         # self.single_sample_identity = tf.argmax(-self.inner_product, 0)
 
-        # print('self.o1 shape:', self.o1.shape)
-        # print('self.inner_product1 shape:', self.inner_product1.shape)
+        print('self.o1 shape:', self.o1.shape)
+        print('self.inner_product1 shape:', self.inner_product1.shape)
 
         # self.loss = self.loss_with_spring()
         # self.distance = self.pair_distance()
@@ -61,9 +61,9 @@ class Siamese:
 
         # self.classify_features = self.cnn_classify_model(self.classify_images, self.is_training, scope_reuse=False)
         # self.classify_features = self.cnn_model2(self.classify_images, self.is_training)
-        self.classify_features = self.cnn_model3(self.classify_images, self.is_training, data_format='channels_first')
-        self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
-        self.predicted_labels = self.classify_predict(self.classify_features)
+        # self.classify_features = self.cnn_model3(self.classify_images, self.is_training, data_format='channels_first')
+        # self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
+        # self.predicted_labels = self.classify_predict(self.classify_features)
 
     def model_variable_scope(self):
         return tf.variable_scope("siamese")
@@ -171,16 +171,19 @@ class Siamese:
         # Add dropout operation; 0.6 probability that element will be kept
         # dropout = tf.layers.dropout(
         #     inputs=dense1, rate=0.4, training=is_training, name='dropout1')
-        features = tf.layers.dense(inputs=dense1, units=10, name='fc2')
+        features = tf.layers.dense(inputs=dense1, units=64, name='fc2')
         # all_variable = tf.global_variables()
         # print(all_variable)
 
+        # siamese:
         # units=2:  Test accuracy: 0.2780
         # units=4:  Test accuracy: 0.4340
         # units=10: Test accuracy: 0.8985
         # units=32: Test accuracy: 0.8850
         # units=10: Test accuracy: 0.9295(without dropout)
         # units=32: Test accuracy: 0.9600(without dropout)
+        # classify:
+        # Test accuracy: 0.9906
         return features
 
     def cnn_model2(self, input_images, is_training):
@@ -244,8 +247,10 @@ class Siamese:
             inputs=dense1, rate=0.4, training=is_training, name='dropout1')
         features = tf.layers.dense(inputs=dropout, units=64, name='fc2')
 
+        # units=2:  Test accuracy: 0.3110
         # units=10: Test accuracy: 0.9750
         # units=32: Test accuracy: 0.9765
+        # units=64: Test accuracy: 0.9785
         return features
 
 

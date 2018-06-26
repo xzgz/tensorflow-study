@@ -154,9 +154,20 @@ def train_siamese_resnet():
                            siamese.x2: gallery_image})
             print('inner_product:', inner_product, inner_product.shape, inner_product.dtype)
             print('True label: {}, predicted label: {}'.format(test_labels[tid], pre_id))
-            # print('output1:', output1)
-            # print('output2:', output2)
+            print('output1:', output1)
+            print('output2:', output2)
             # print('inner_product1:\n', inner_product1)
+        if iterations == max_iterations:
+            print('Start test all...')
+            correct_count = 0
+            for i in range(100, test_images_num):
+                tm = test_images[i]
+                idn = siamese.single_sample_identity.eval({siamese.x1: siamese_resnet_model.format_single_sample(tm),
+                                                           siamese.x2: gallery_image})
+                if gallery_label[idn] == test_labels[i]:
+                    correct_count += 1
+            accuracy = correct_count / (2100-test_images_num)
+            print('Test accuracy: {:.4f}'.format(accuracy))
 train_siamese_resnet()
 
 
