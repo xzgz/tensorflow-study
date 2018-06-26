@@ -25,7 +25,7 @@ os.chdir(root)
 from siamese_tf_mnist import siamese_resnet_model
 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 model_save_dir = 'model/mnist'
 # model_save_dir = 'model/20180601_resnet_v2_imagenet_savedmodel/1527887769/variables'
 
@@ -105,7 +105,7 @@ def train_siamese_resnet():
     print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
     distance, distance1, pre_id = sess.run(
-        [siamese.distance, siamese.distance1, siamese.single_sample_identity],
+        [siamese.distance, siamese.distance, siamese.single_sample_identity],
         feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[tid]),
                    siamese.x2: gallery_image})
     print('distance:', distance, distance.shape, distance.dtype)
@@ -149,7 +149,7 @@ def train_siamese_resnet():
             print('Test accuracy: {:.4f}'.format(accuracy))
         # if iterations % 10000 == 0:
             output1, output2, distance, distance1, pre_id = sess.run(
-                [siamese.o1, siamese.o2, siamese.distance, siamese.distance1, siamese.single_sample_identity],
+                [siamese.o1, siamese.o2, siamese.distance, siamese.distance, siamese.single_sample_identity],
                 feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[tid]),
                            siamese.x2: gallery_image})
             print('distance:', distance, distance.shape, distance.dtype)
