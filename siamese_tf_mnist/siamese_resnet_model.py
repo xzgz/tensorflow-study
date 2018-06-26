@@ -107,13 +107,13 @@ class Siamese:
         self.classify_labels = tf.placeholder(tf.int32, [None])
         self.is_training = is_training
 
-        # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
-        # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
+        self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
+        self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
 
-        with self.model_variable_scope() as scope:
-            self.o1 = self.cnn_model2(self.x1, self.is_training)
-            scope.reuse_variables()
-            self.o2 = self.cnn_model2(self.x2, self.is_training)
+        # with self.model_variable_scope() as scope:
+        #     self.o1 = self.cnn_model2(self.x1, self.is_training)
+        #     scope.reuse_variables()
+        #     self.o2 = self.cnn_model2(self.x2, self.is_training)
 
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
@@ -196,6 +196,9 @@ class Siamese:
         features = resnet50_mnist(inputs, is_training, scope_reuse)
         # params = tf.trainable_variables()
         # print(params)
+
+        # siamese(spring loss):
+        # num_classes=32: Test accuracy: 0.3150
         return features
 
     def cnn_model3(self, input_images, is_training, data_format):
