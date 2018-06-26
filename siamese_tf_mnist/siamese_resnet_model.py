@@ -292,7 +292,7 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                labels.append(batch_y)
+                labels.append(batch_y[i])
                 # labels.append(False)
             pos_num += 1
             if pos_num == pos_cnt:
@@ -301,7 +301,7 @@ def generate_train_samples(mnist, batch_size, positive_rate):
         batch_x1, batch_y1 = mnist.train.next_batch(100)
         batch_x2, batch_y2 = mnist.train.next_batch(100)
         batch_y = (batch_y1 == batch_y2)
-        for i, v in enumerate(batch_y[i]):
+        for i, v in enumerate(batch_y):
             if not v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
