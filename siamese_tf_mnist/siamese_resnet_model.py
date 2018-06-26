@@ -127,11 +127,11 @@ class Siamese:
             padding="same",
             data_format=data_format,
             name='conv1')
-        # conv1 = batch_norm(conv1, is_training, data_format)
-        conv1 = tf.layers.batch_normalization(
-            inputs=conv1, axis=1 if data_format == 'channels_first' else 3,
-            momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON, center=True,
-            scale=True, training=is_training, fused=True, name='bn1')
+        conv1 = self.batch_norm(conv1, is_training, data_format, name='bn1')
+        # conv1 = tf.layers.batch_normalization(
+        #     inputs=conv1, axis=1 if data_format == 'channels_first' else 3,
+        #     momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON, center=True,
+        #     scale=True, training=is_training, fused=True, name='bn1')
         conv1 = tf.nn.relu(conv1)
 
         # Pooling Layer #1
@@ -152,11 +152,11 @@ class Siamese:
             padding="same",
             data_format=data_format,
             name='conv2')
-        # conv2 = batch_norm(conv2, is_training, data_format)
-        conv2 = tf.layers.batch_normalization(
-            inputs=conv2, axis=1 if data_format == 'channels_first' else 3,
-            momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON, center=True,
-            scale=True, training=is_training, fused=True, name='bn2')
+        conv2 = self.batch_norm(conv2, is_training, data_format, name='bn2')
+        # conv2 = tf.layers.batch_normalization(
+        #     inputs=conv2, axis=1 if data_format == 'channels_first' else 3,
+        #     momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON, center=True,
+        #     scale=True, training=is_training, fused=True, name='bn2')
         conv2 = tf.nn.relu(conv2)
 
         # Pooling Layer #2
@@ -180,6 +180,8 @@ class Siamese:
         dropout = tf.layers.dropout(
             inputs=dense1, rate=0.4, training=is_training, name='dropout1')
         features = tf.layers.dense(inputs=dropout, units=32, name='fc2')
+        all_variable = tf.global_variables()
+        print(all_variable)
 
         return features
 
@@ -221,14 +223,14 @@ class Siamese:
         fc = tf.nn.bias_add(tf.matmul(bottom, W), b)
         return fc
 
-    def batch_norm(self, inputs, training, data_format):
+    def batch_norm(self, inputs, training, data_format, name):
         """Performs a batch normalization using a standard set of parameters."""
         # We set fused=True for a significant performance boost. See
         # https://www.tensorflow.org/performance/performance_guide#common_fused_ops
         return tf.layers.batch_normalization(
             inputs=inputs, axis=1 if data_format == 'channels_first' else 3,
             momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON, center=True,
-            scale=True, training=training, fused=True)
+            scale=True, training=training, fused=True, name=name)
 
     def loss_with_spring(self):
         margin = 5.0
