@@ -108,15 +108,15 @@ class Siamese:
         # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
         # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
 
-        with self.model_variable_scope() as scope:
-            self.o1 = self.cnn_model2(self.x1, self.is_training)
-            scope.reuse_variables()
-            self.o2 = self.cnn_model2(self.x2, self.is_training)
-
         # with self.model_variable_scope() as scope:
-        #     self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
+        #     self.o1 = self.cnn_model2(self.x1, self.is_training)
         #     scope.reuse_variables()
-        #     self.o2 = self.cnn_model3(self.x2, self.is_training, data_format='channels_first')
+        #     self.o2 = self.cnn_model2(self.x2, self.is_training)
+
+        with self.model_variable_scope() as scope:
+            self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
+            scope.reuse_variables()
+            self.o2 = self.cnn_model3(self.x2, self.is_training, data_format='channels_first')
 
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.network(self.x1)
@@ -258,7 +258,7 @@ class Siamese:
         # all_variable = tf.global_variables()
         # print(all_variable)
 
-        # siamese:
+        # siamese(cross entropy loss):
         # units=2:  Test accuracy: 0.2780
         # units=4:  Test accuracy: 0.4340
         # units=10: Test accuracy: 0.8985
@@ -288,7 +288,6 @@ class Siamese:
             padding="same",
             activation=tf.nn.relu,
             name='conv1')
-        print(conv1.name)
 
         # Pooling Layer #1
         # First max pooling layer with a 2x2 filter and stride of 2
@@ -331,11 +330,14 @@ class Siamese:
         #     inputs=dense1, rate=0.4, training=is_training, name='dropout1')
         features = tf.layers.dense(inputs=dense1, units=32, name='fc2')
 
-        # siamese:
+        # siamese(cross entropy loss):
         # units=2:  Test accuracy: 0.3110
         # units=10: Test accuracy: 0.9750
         # units=32: Test accuracy: 0.9765
         # units=64: Test accuracy: 0.9785
+        # units=32: Test accuracy: 0.9835(without dropout)
+        # siamese(spring loss):
+        # units=32: Test accuracy: 0.9880(without dropout)
         return features
 
 
