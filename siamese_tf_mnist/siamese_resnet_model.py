@@ -240,7 +240,7 @@ class Siamese:
         # Add dropout operation; 0.6 probability that element will be kept
         dropout = tf.layers.dropout(
             inputs=dense1, rate=0.4, training=is_training, name='dropout1')
-        features = tf.layers.dense(inputs=dropout, units=32, name='fc2')
+        features = tf.layers.dense(inputs=dropout, units=10, name='fc2')
 
         return features
 
