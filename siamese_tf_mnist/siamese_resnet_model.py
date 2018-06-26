@@ -118,6 +118,7 @@ class Siamese:
             inputs=input_layer,
             filters=32,
             kernel_size=[5, 5],
+            strides=2,
             padding="same",
             data_format=data_format,
             name='conv1')
@@ -128,7 +129,7 @@ class Siamese:
         # First max pooling layer with a 2x2 filter and stride of 2
         # Input Tensor Shape: [batch_size, 28, 28, 32]
         # Output Tensor Shape: [batch_size, 14, 14, 32]
-        pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2, data_format=data_format, name='pool1')
+        # pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2, data_format=data_format, name='pool1')
 
         # Convolutional Layer #2
         # Computes 64 features using a 5x5 filter.
@@ -136,9 +137,10 @@ class Siamese:
         # Input Tensor Shape: [batch_size, 14, 14, 32]
         # Output Tensor Shape: [batch_size, 14, 14, 64]
         conv2 = tf.layers.conv2d(
-            inputs=pool1,
+            inputs=conv1,
             filters=64,
             kernel_size=[5, 5],
+            strides=2,
             padding="same",
             data_format=data_format,
             name='conv2')
@@ -149,12 +151,12 @@ class Siamese:
         # Second max pooling layer with a 2x2 filter and stride of 2
         # Input Tensor Shape: [batch_size, 14, 14, 64]
         # Output Tensor Shape: [batch_size, 7, 7, 64]
-        pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2, data_format=data_format, name='pool2')
+        # pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2, data_format=data_format, name='pool2')
 
         # Flatten tensor into a batch of vectors
         # Input Tensor Shape: [batch_size, 7, 7, 64]
         # Output Tensor Shape: [batch_size, 7 * 7 * 64]
-        pool2_flat = tf.reshape(pool2, [-1, 7 * 7 * 64])
+        pool2_flat = tf.reshape(conv2, [-1, 7 * 7 * 64])
 
         # Dense Layer
         # Densely connected layer with 1024 neurons
@@ -170,7 +172,7 @@ class Siamese:
         # units=10: Test accuracy: 0.8985
         # units=32: Test accuracy: 0.8850
         # units=32: Test accuracy: 0.9600(without dropout)
-        features = tf.layers.dense(inputs=dense1, units=32, name='fc2')
+        features = tf.layers.dense(inputs=dense1, units=10, name='fc2')
         # all_variable = tf.global_variables()
         # print(all_variable)
 
