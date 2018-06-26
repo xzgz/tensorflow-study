@@ -86,7 +86,7 @@ def train_siamese_resnet():
     # batch_x2, batch_y2 = mnist.train.next_batch(128)
     # batch_y = (batch_y1 == batch_y2).astype('float')
     batch_x1, batch_x2, batch_y = siamese_resnet_model.generate_train_samples(mnist, batch_size, positive_rate=0.5)
-    inner_product, initial_loss = sess.run([siamese.distance, siamese.loss], feed_dict={
+    distance, initial_loss = sess.run([siamese.distance, siamese.loss], feed_dict={
         siamese.x1: batch_x1,
         siamese.x2: batch_x2,
         siamese.y_: batch_y})
@@ -104,13 +104,13 @@ def train_siamese_resnet():
     print('Global step:', sess.run(global_step))
     print('Initial learning rate:', sess.run(lr))
     print('Initial accuracy: {:.4f}'.format(accuracy))
-    inner_product, inner_product1, pre_id = sess.run(
-        [siamese.distance, siamese.distance, siamese.single_sample_identity],
+    distance, distance1, pre_id = sess.run(
+        [siamese.distance, siamese.distance1, siamese.single_sample_identity],
         feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[tid]),
                    siamese.x2: gallery_image})
-    print('inner_product:', inner_product, inner_product.shape, inner_product.dtype)
+    print('distance:', distance, distance.shape, distance.dtype)
     print('True label: {}, predicted label: {}'.format(test_labels[tid], pre_id))
-    print('inner_product1:\n', inner_product1)
+    print('distance1:\n', distance1)
 
 
     print('Start train...')
@@ -118,7 +118,7 @@ def train_siamese_resnet():
         iterations = step+1
         batch_x1, batch_x2, batch_y = siamese_resnet_model.generate_train_samples(mnist, batch_size, positive_rate=0.5)
 
-        _, loss_v, gs_v, lr_v, inner_product = sess.run(
+        _, loss_v, gs_v, lr_v, distance = sess.run(
             [train_step, siamese.loss, global_step, lr, siamese.distance],
             feed_dict={siamese.x1: batch_x1,
                        siamese.x2: batch_x2,
@@ -132,7 +132,7 @@ def train_siamese_resnet():
             # print('step %d: loss %.3f' % (iterations, loss_v))
             print('Global step: {:d}, iterations: {:d}, learning rate: {:.5f}, loss: {:.4f}'.format(
                 gs_v, iterations, lr_v, loss_v))
-            # print('inner_product:', inner_product)
+            # print('distance:', distance)
 
         if iterations % 2000 == 0:
             saver.save(sess=sess, save_path=model_save_path, global_step=iterations)
@@ -148,16 +148,16 @@ def train_siamese_resnet():
             accuracy = correct_count / (2100-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
         # if iterations % 10000 == 0:
-            output1, output2, inner_product, inner_product1, pre_id = sess.run(
-                [siamese.o1, siamese.o2, siamese.distance, siamese.distance, siamese.single_sample_identity],
+            output1, output2, distance, distance1, pre_id = sess.run(
+                [siamese.o1, siamese.o2, siamese.distance, siamese.distance1, siamese.single_sample_identity],
                 feed_dict={siamese.x1: siamese_resnet_model.format_single_sample(test_images[tid]),
                            siamese.x2: gallery_image})
-            print('inner_product:', inner_product, inner_product.shape, inner_product.dtype)
+            print('distance:', distance, distance.shape, distance.dtype)
             print('True label: {}, predicted label: {}'.format(test_labels[tid], pre_id))
             # for i, v in enumerate(output1):
                 # print('output1_'+str(i)+':', output1[i])
                 # print('output2_'+str(i)+':', output2[i])
-            # print('inner_product1:\n', inner_product1)
+            # print('distance1:\n', distance1)
         if iterations == max_iterations:
             print('Start test all...')
             correct_count = 0
