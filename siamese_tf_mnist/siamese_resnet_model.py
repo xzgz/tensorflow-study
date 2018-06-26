@@ -130,7 +130,7 @@ class Siamese:
         print('********************************')
         self.distance1 = tf.multiply(self.o1, self.o2)
         self.distance = tf.reduce_sum(self.distance1, axis=1)
-        self.loss = self.loss_cross_entropy(-self.distance-1.0)
+        self.loss = self.loss_cross_entropy(-self.distance-10.0)
         self.single_sample_identity = tf.argmax(self.distance, axis=0)
 
         # Not work...
