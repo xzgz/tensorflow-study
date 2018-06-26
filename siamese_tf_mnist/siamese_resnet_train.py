@@ -126,7 +126,7 @@ def train_siamese_resnet():
 
         if np.isnan(loss_v):
             print('Model diverged with loss = NaN')
-            # quit()
+            quit()
         if iterations % 500 == 0:
             # print('batch_y:\n', batch_y)
             # print('step %d: loss %.3f' % (iterations, loss_v))
