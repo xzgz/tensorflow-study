@@ -25,10 +25,10 @@ class Siamese:
         # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
         # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
 
-        with self.model_variable_scope() as scope:
-            self.o1 = self.cnn_model2(self.x1, self.is_training)
-            scope.reuse_variables()
-            self.o2 = self.cnn_model2(self.x2, self.is_training)
+        # with self.model_variable_scope() as scope:
+        #     self.o1 = self.cnn_model2(self.x1, self.is_training)
+        #     scope.reuse_variables()
+        #     self.o2 = self.cnn_model2(self.x2, self.is_training)
 
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
@@ -40,10 +40,10 @@ class Siamese:
         #     scope.reuse_variables()
         #     self.o2 = self.network(self.x2)
 
-        self.inner_product1 = tf.multiply(self.o1, self.o2)
-        self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
-        self.loss = self.loss_cross_entropy(self.inner_product)
-        self.single_sample_identity = tf.argmax(self.inner_product, axis=0)
+        # self.inner_product1 = tf.multiply(self.o1, self.o2)
+        # self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
+        # self.loss = self.loss_cross_entropy(self.inner_product)
+        # self.single_sample_identity = tf.argmax(self.inner_product, axis=0)
 
         # Not work...
         # self.inner_product1 = tf.multiply(self.o1, self.o2)
@@ -52,8 +52,8 @@ class Siamese:
         # self.loss = self.loss_cross_entropy(self.inner_product)
         # self.single_sample_identity = tf.argmax(-self.inner_product, 0)
 
-        print('self.o1 shape:', self.o1.shape)
-        print('self.inner_product1 shape:', self.inner_product1.shape)
+        # print('self.o1 shape:', self.o1.shape)
+        # print('self.inner_product1 shape:', self.inner_product1.shape)
 
         # self.loss = self.loss_with_spring()
         # self.distance = self.pair_distance()
@@ -61,8 +61,9 @@ class Siamese:
 
         # self.classify_features = self.cnn_classify_model(self.classify_images, self.is_training, scope_reuse=False)
         # self.classify_features = self.cnn_model2(self.classify_images, self.is_training)
-        # self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
-        # self.predicted_labels = self.classify_predict(self.classify_features)
+        self.classify_features = self.cnn_model3(self.classify_images, self.is_training, data_format='channels_first')
+        self.classify_loss = self.loss_classify(self.classify_features, self.classify_labels)
+        self.predicted_labels = self.classify_predict(self.classify_features)
 
     def model_variable_scope(self):
         return tf.variable_scope("siamese")
