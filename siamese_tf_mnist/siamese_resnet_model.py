@@ -181,14 +181,14 @@ class Siamese:
             resnet_size=32,                         # resnet_size must be 6n+2, here n=5
             bottleneck=False,
             num_classes=32,
-            num_filters=16,
+            num_filters=8,
             kernel_size=3,
             conv_stride=1,
             first_pool_size=None,
             first_pool_stride=None,
-            block_sizes=[5] * 3,
+            block_sizes=[3] * 3,
             block_strides=[1, 2, 2],
-            final_size=64,
+            final_size=32,
             resnet_version=2,
             data_format='channels_first',
             dtype=tf.float32
