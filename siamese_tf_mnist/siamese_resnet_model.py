@@ -84,14 +84,16 @@ def sigmoid_cross_entropy_with_logits(  # pylint: disable=invalid-name
         #   max(x, 0) - x * z + log(1 + exp(-abs(x)))
         # To allow computing gradients at zero, we define custom versions of max and
         # abs functions.
-        zeros = array_ops.zeros_like(logits, dtype=logits.dtype)
-        cond = (logits >= zeros)
-        relu_logits = array_ops.where(cond, logits, zeros)
-        neg_abs_logits = array_ops.where(cond, -logits, logits)
-        return math_ops.add(
-            relu_logits - logits * labels,
-            math_ops.log1p(math_ops.exp(neg_abs_logits)),
-            name=name)
+        # zeros = array_ops.zeros_like(logits, dtype=logits.dtype)
+        # cond = (logits >= zeros)
+        # relu_logits = array_ops.where(cond, logits, zeros)
+        # neg_abs_logits = array_ops.where(cond, -logits, logits)
+        # return math_ops.add(
+        #     relu_logits - logits * labels,
+        #     math_ops.log1p(math_ops.exp(neg_abs_logits)),
+        #     name=name)
+        return math_ops.add(-math_ops.log(2.0) + (labels-1)*math_ops.log(math_ops.exp(-logits) - 1),
+                     math_ops.log1p(math_ops.exp(-logits)), name=name)
 
 
 class Siamese:
@@ -105,13 +107,13 @@ class Siamese:
         self.classify_labels = tf.placeholder(tf.int32, [None])
         self.is_training = is_training
 
-        self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
-        self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
+        # self.o1 = self.cnn_model(self.x1, self.is_training, scope_reuse=False)
+        # self.o2 = self.cnn_model(self.x2, self.is_training, scope_reuse=True)
 
-        # with self.model_variable_scope() as scope:
-        #     self.o1 = self.cnn_model2(self.x1, self.is_training)
-        #     scope.reuse_variables()
-        #     self.o2 = self.cnn_model2(self.x2, self.is_training)
+        with self.model_variable_scope() as scope:
+            self.o1 = self.cnn_model2(self.x1, self.is_training)
+            scope.reuse_variables()
+            self.o2 = self.cnn_model2(self.x2, self.is_training)
 
         # with self.model_variable_scope() as scope:
         #     self.o1 = self.cnn_model3(self.x1, self.is_training, data_format='channels_first')
@@ -123,13 +125,13 @@ class Siamese:
         #     scope.reuse_variables()
         #     self.o2 = self.network(self.x2)
 
-        # print('********************************')
-        # print('Use cross entropy loss to train.')
-        # print('********************************')
-        # self.distance1 = tf.multiply(self.o1, self.o2)
-        # self.distance = tf.reduce_sum(self.distance1, axis=1)
-        # self.loss = self.loss_cross_entropy(self.distance)
-        # self.single_sample_identity = tf.argmax(self.distance, axis=0)
+        print('********************************')
+        print('Use cross entropy loss to train.')
+        print('********************************')
+        self.distance1 = tf.multiply(self.o1, self.o2)
+        self.distance = tf.reduce_sum(self.distance1, axis=1)
+        self.loss = self.loss_cross_entropy(self.distance)
+        self.single_sample_identity = tf.argmax(self.distance, axis=0)
 
         # Not work...
         # self.inner_product1 = tf.multiply(self.o1, self.o2)
@@ -139,14 +141,14 @@ class Siamese:
         # self.single_sample_identity = tf.argmax(-self.inner_product, 0)
 
         print('self.o1 shape:', self.o1.shape)
-        # print('self.inner_product1 shape:', self.distance1.shape)
+        print('self.inner_product1 shape:', self.distance1.shape)
 
-        print('*************************')
-        print('Use spring loss to train.')
-        print('*************************')
-        self.loss = self.loss_with_spring()
-        self.distance = self.pair_distance()
-        self.single_sample_identity = tf.argmax(-self.distance, 0)
+        # print('*************************')
+        # print('Use spring loss to train.')
+        # print('*************************')
+        # self.loss = self.loss_with_spring()
+        # self.distance = self.pair_distance()
+        # self.single_sample_identity = tf.argmax(-self.distance, 0)
 
         # self.classify_features = self.cnn_classify_model(self.classify_images, self.is_training, scope_reuse=False)
         # self.classify_features = self.cnn_model2(self.classify_images, self.is_training)
