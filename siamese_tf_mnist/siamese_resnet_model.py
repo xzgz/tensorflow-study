@@ -42,7 +42,7 @@ class Siamese:
 
         self.inner_product1 = tf.multiply(self.o1, self.o2)
         self.inner_product = tf.reduce_sum(self.inner_product1, axis=1)
-        self.loss = self.loss_cross_entropy(self.inner_product)
+        self.loss = self.loss_cross_entropy(-self.inner_product)
         self.single_sample_identity = tf.argmax(self.inner_product, axis=0)
 
         # Not work...
@@ -381,8 +381,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                labels.append(batch_y[i])
-                # labels.append(False)
+                # labels.append(batch_y[i])
+                labels.append(False)
             pos_num += 1
             if pos_num == pos_cnt:
                 break
@@ -394,8 +394,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if not v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                labels.append(batch_y[i])
-                # labels.append(True)
+                # labels.append(batch_y[i])
+                labels.append(True)
             neg_num += 1
             if neg_num == neg_cnt:
                 break
