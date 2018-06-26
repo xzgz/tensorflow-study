@@ -166,7 +166,7 @@ def train_siamese_resnet():
                                                            siamese.x2: gallery_image})
                 if gallery_label[idn] == test_labels[i]:
                     correct_count += 1
-            accuracy = correct_count / (2100-test_images_num)
+            accuracy = correct_count / (test_images_num-100)
             print('Test accuracy: {:.4f}'.format(accuracy))
 train_siamese_resnet()
 
