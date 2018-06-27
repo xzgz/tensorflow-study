@@ -130,7 +130,8 @@ class Siamese:
         print('********************************')
         self.distance1 = tf.multiply(self.o1, self.o2)
         self.distance = tf.reduce_sum(self.distance1, axis=1)
-        self.loss = self.loss_cross_entropy(-self.distance/10.0-0.1)
+        # self.loss = self.loss_cross_entropy(-self.distance/10.0-0.1)
+        self.loss = self.loss_cross_entropy(self.distance)
         self.single_sample_identity = tf.argmax(self.distance, axis=0)
 
         # Not work...
@@ -436,8 +437,8 @@ class Siamese:
         return loss
 
     def loss_cross_entropy(self, inner_product):
-        # losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
-        losses = sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
+        losses = tf.nn.sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
+        # losses = sigmoid_cross_entropy_with_logits(labels=self.y_, logits=inner_product)
         loss = tf.reduce_mean(losses, name='siamese_loss')
         # tf.nn.softmax_cross_entropy_with_logits()
         return loss
@@ -485,8 +486,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                # labels.append(batch_y[i])
-                labels.append(False)
+                labels.append(batch_y[i])
+                # labels.append(False)
             pos_num += 1
             if pos_num == pos_cnt:
                 break
@@ -498,8 +499,8 @@ def generate_train_samples(mnist, batch_size, positive_rate):
             if not v:
                 batch1.append(batch_x1[i])
                 batch2.append(batch_x2[i])
-                # labels.append(batch_y[i])
-                labels.append(True)
+                labels.append(batch_y[i])
+                # labels.append(True)
             neg_num += 1
             if neg_num == neg_cnt:
                 break
