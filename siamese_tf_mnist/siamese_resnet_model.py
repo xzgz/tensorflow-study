@@ -180,15 +180,15 @@ class Siamese:
         resnet50_mnist = resnet_model.Model(
             resnet_size=32,                         # resnet_size must be 6n+2, here n=5
             bottleneck=False,
-            num_classes=32,
-            num_filters=8,
+            num_classes=10,
+            num_filters=16,
             kernel_size=3,
             conv_stride=1,
             first_pool_size=None,
             first_pool_stride=None,
-            block_sizes=[2] * 2,
-            block_strides=[2, 2],
-            final_size=16,
+            block_sizes=[5] * 3,
+            block_strides=[1, 2, 2],
+            final_size=64,
             resnet_version=2,
             data_format='channels_first',
             dtype=tf.float32
@@ -196,6 +196,8 @@ class Siamese:
         features = resnet50_mnist(inputs, is_training, scope_reuse)
         # params = tf.trainable_variables()
         # print(params)
+        all_variable = tf.global_variables()
+        print(all_variable)
 
         # siamese(spring loss):
         # num_classes=32: Test accuracy: 0.3150
